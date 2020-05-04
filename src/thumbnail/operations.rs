@@ -124,7 +124,13 @@ pub(crate) struct HuerotateOp {
 
 impl Operation for HuerotateOp {
     fn apply(&self, image: &mut Thumbnail) -> bool where Self: Sized {
-        unimplemented!()
+        let dynamic_image = match &image.image {
+            Some(dyn_img) => dyn_img,
+            None => return false,
+        };
+
+        image.image = Some(dynamic_image.huerotate(self.degree));
+        true
     }
 }
 
