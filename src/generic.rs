@@ -32,7 +32,7 @@ pub enum Exif {
      Blacklist(Vec<u16>)
 }
 
-pub enum FilterType {
+pub enum ResampleFilter {
     Nearest,
     Triangle,
     CatmullRom,
@@ -43,7 +43,7 @@ pub enum FilterType {
 
 pub trait GenericThumbnail{
     fn resize(&mut self, size: &Resize) -> &mut dyn GenericThumbnail;
-    fn resize_filter(&mut self, size: &Resize, filter: FilterType) -> &mut dyn GenericThumbnail;
+    fn resize_filter(&mut self, size: &Resize, filter: ResampleFilter) -> &mut dyn GenericThumbnail;
 
 
     fn blur(&mut self, sigma: f32) -> &mut dyn GenericThumbnail;
@@ -59,6 +59,6 @@ pub trait GenericThumbnail{
     fn exif(&mut self, metadata: Exif) -> &mut dyn GenericThumbnail;
     fn text(&mut self, text: str, pos: BoxPosition) -> &mut dyn GenericThumbnail;
 
-    fn combine(&mut self, image: StaticThumbnail, pos: BoxPosition) -> &mut dyn GenericThumbnail;
+    fn combine(&mut self, image: &StaticThumbnail, pos: BoxPosition) -> &mut dyn GenericThumbnail;
 
 }
