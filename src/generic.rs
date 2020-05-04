@@ -25,7 +25,7 @@ pub enum Orientation {
     Horizontal
 }
 
-pub enum Metadata {
+pub enum Exif {
      Keep,
      Clear,
      Whitelist(Vec<u16>),
@@ -56,7 +56,7 @@ pub trait GenericThumbnail{
 
     fn invert(&mut self) -> &mut dyn GenericThumbnail;
 
-    fn metadata(&mut self, metadata: Metadata) -> &mut dyn GenericThumbnail;
+    fn exif(&mut self, metadata: Exif) -> &mut dyn GenericThumbnail;
     fn text(&mut self, text: str, pos: BoxPosition) -> &mut dyn GenericThumbnail;
 
     fn combine(&mut self, image: StaticThumbnail, pos: BoxPosition) -> &mut dyn GenericThumbnail;
