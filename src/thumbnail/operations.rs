@@ -82,8 +82,36 @@ pub(crate) struct CropOp {
 
 impl Operation for CropOp {
     fn apply(&self, image: &mut Thumbnail) -> bool where Self: Sized {
-        unimplemented!()
+        let dynamic_image = match &image.image {
+            Some(dyn_img) => dyn_img,
+            None => return false,
+        };
     }
+    
+    match self.crop {
+        Box(x, y, w, h) => {
+            image.image = Some(dynamic_image.crop(x, y, w, h));
+        },
+        Ratio(w_r, h_r) => {
+            let ratio_old = image.width / image.height;
+            let ratio_new = w_r / h_r;
+
+            if ratio_old <= ratio_new {
+                let height_new = (ratio_old / ratio_new) * image.height;
+                let y_new = (image.height - height_new) / 2;
+
+                image.image = Some(dynamic_image.crop(0, y_new, image.width, height_new));
+            }
+            else {
+                let width_new = (ratio_new / ratio_old) * image.width;
+                let x_new = (image.width - width_new) / 2;
+
+                image.image = Some(dynamic_image.crop(x_new, 0, width_new, image.height));
+            }
+        },
+    }
+
+    true
 }
 
 pub(crate) struct BlurOp {
