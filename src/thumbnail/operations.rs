@@ -168,7 +168,13 @@ pub(crate) struct ContrastOp {
 
 impl Operation for ContrastOp {
     fn apply(&self, image: &mut Thumbnail) -> bool where Self: Sized {
-        unimplemented!()
+        let dynamic_image = match &image.image {
+            Some(dyn_img) => dyn_img,
+            None => return false,
+        };
+
+        image.image = Some(dynamic_image.adjust_contrast(self.value));
+        true
     }
 }
 
