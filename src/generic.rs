@@ -65,5 +65,6 @@ pub trait GenericThumbnail{
     fn exif(&mut self, metadata: Exif) -> &mut dyn GenericThumbnail;
     fn text(&mut self, text: String, pos: BoxPosition) -> &mut dyn GenericThumbnail;
 
-    fn combine(&mut self, image: &StaticThumbnail, pos: BoxPosition) -> &mut dyn GenericThumbnail;
+    fn combine(&mut self, image: StaticThumbnail, pos: BoxPosition) -> &mut dyn GenericThumbnail;
+
 }
