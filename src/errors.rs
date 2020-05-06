@@ -12,13 +12,12 @@ pub enum FileError<'a> {
     IoError(io::Error),
 }
 
-pub(crate) enum InternalError<'a> {
-    FileError(FileError<'a>),
+pub(crate) enum InternalError {
     ImageError(ImageError),
     UnknownError(UnknownError),
 }
 
-impl std::convert::From<image::error::ImageError> for InternalError<'_> {
+impl std::convert::From<image::error::ImageError> for InternalError {
     fn from(err: ImageError) -> Self {
         InternalError::ImageError(err)
     }
