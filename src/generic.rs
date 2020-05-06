@@ -1,5 +1,6 @@
 use crate::StaticThumbnail;
 
+#[derive(Debug, Copy, Clone)]
 pub enum Resize {
     Height(u32),
     Width(u32),
@@ -7,6 +8,7 @@ pub enum Resize {
     ExactBox(u32, u32)
 }
 
+#[derive(Debug, Copy, Clone)]
 pub enum BoxPosition {
      TopLeft(u32, u32),
      TopRight(u32, u32),
@@ -14,17 +16,19 @@ pub enum BoxPosition {
      BottomRight(u32, u32)
 }
 
-
+#[derive(Debug, Copy, Clone)]
 pub enum Crop {
     Box(u32, u32, u32, u32),
     Ratio(f32, f32)
 }
 
+#[derive(Debug, Copy, Clone)]
 pub enum Orientation {
     Vertical,
     Horizontal
 }
 
+#[derive(Debug, Clone)]
 pub enum Exif {
      Keep,
      Clear,
@@ -32,6 +36,7 @@ pub enum Exif {
      Blacklist(Vec<u16>)
 }
 
+#[derive(Debug, Copy, Clone)]
 pub enum ResampleFilter {
     Nearest,
     Triangle,
