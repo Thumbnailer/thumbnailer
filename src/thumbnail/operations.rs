@@ -204,7 +204,6 @@ impl ContrastOp {
 
 impl Operation for ContrastOp {
     fn apply(&self, image: &mut DynamicImage) -> bool where Self: Sized {
-
         *image = image.adjust_contrast(self.value);
         true
     }
@@ -243,7 +242,8 @@ impl InvertOp {
 
 impl Operation for InvertOp {
     fn apply(&self, image: &mut DynamicImage) -> bool where Self: Sized {
-        unimplemented!()
+        image.invert();
+        true
     }
 }
 
