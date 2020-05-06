@@ -184,7 +184,17 @@ pub(crate) struct FlipOp {
 
 impl Operation for FlipOp {
     fn apply(&self, image: &mut Thumbnail) -> bool where Self: Sized {
-        unimplemented!()
+        let dynamic_image = match &image.image {
+            Some(dyn_img) => dyn_img,
+            None => return false,
+        };
+
+        match self.orientation {
+            Orientation::Vertical => image.image = Some(dynamic_image.flipv()),
+            Orientation::Horizontal => image.image = Some(dynamic_image.fliph()),
+        }
+
+        true
     }
 }
 
