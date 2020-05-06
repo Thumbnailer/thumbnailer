@@ -67,4 +67,5 @@ pub trait GenericThumbnail{
 
     fn combine(&mut self, image: StaticThumbnail, pos: BoxPosition) -> &mut dyn GenericThumbnail;
 
+    fn apply(&mut self) -> &mut dyn GenericThumbnail;
 }
