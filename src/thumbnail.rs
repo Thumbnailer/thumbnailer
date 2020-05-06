@@ -1,15 +1,13 @@
-use image::{DynamicImage, image_dimensions, ImageResult, ImageError, io::Reader, GenericImageView};
+use image::{DynamicImage, io::Reader, GenericImageView};
 use crate::{
     generic::{GenericThumbnail, Crop, Exif, Resize, BoxPosition, Orientation, ResampleFilter},
-    thumbnail::operations::{Operation, ResizeOp},
+    thumbnail::operations::{Operation},
     errors::{FileNotFoundError, FileNotSupportedError, FileError, InternalError},
     errors
 };
 use std::{
-    io,
     path::Path,
-    error::Error,
-    io::{Read, BufReader},
+    io::BufReader,
     fs::File
 };
 
