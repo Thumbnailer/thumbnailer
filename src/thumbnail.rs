@@ -10,6 +10,7 @@ use std::{
     io::BufReader,
     fs::File,
 };
+use crate::thumbnail::operations::{ResizeOp, BlurOp, BrightenOp, HuerotateOp, ContrastOp, UnsharpenOp, CropOp, FlipOp, InvertOp, ExifOp, TextOp, CombineOp};
 use crate::thumbnail::ImageData::Image;
 
 mod operations;
@@ -138,55 +139,68 @@ impl SingleThumbnail for Thumbnail<'_> {
 }
 
 impl GenericThumbnail for Thumbnail<'_> {
-    fn resize(&mut self, size: Resize) -> &mut GenericThumbnail {
-        unimplemented!()
+    fn resize(&mut self, size: Resize) -> &mut dyn GenericThumbnail {
+        self.ops.push(Box::new(ResizeOp::new(size, None)));
+        self
     }
 
-    fn resize_filter(&mut self, size: Resize, filter: ResampleFilter) -> &mut GenericThumbnail {
-        unimplemented!()
+    fn resize_filter(&mut self, size: Resize, filter: ResampleFilter) -> &mut dyn GenericThumbnail {
+        self.ops.push(Box::new(ResizeOp::new(size, Option::from(filter))));
+        self
     }
 
-    fn blur(&mut self, sigma: f32) -> &mut GenericThumbnail {
-        unimplemented!()
+    fn blur(&mut self, sigma: f32) -> &mut dyn GenericThumbnail {
+        self.ops.push(Box::new(BlurOp::new(sigma)));
+        self
     }
 
-    fn brighten(&mut self, value: i32) -> &mut GenericThumbnail {
-        unimplemented!()
+    fn brighten(&mut self, value: i32) -> &mut dyn GenericThumbnail {
+        self.ops.push(Box::new(BrightenOp::new(value)));
+        self
     }
 
-    fn huerotate(&mut self, degree: i32) -> &mut GenericThumbnail {
-        unimplemented!()
+    fn huerotate(&mut self, degree: i32) -> &mut dyn GenericThumbnail {
+        self.ops.push(Box::new(HuerotateOp::new(degree)));
+        self
     }
 
-    fn contrast(&mut self, value: f32) -> &mut GenericThumbnail {
-        unimplemented!()
+    fn contrast(&mut self, value: f32) -> &mut dyn GenericThumbnail {
+        self.ops.push(Box::new(ContrastOp::new(value)));
+        self
     }
 
-    fn unsharpen(&mut self, sigma: f32, threshold: u32) -> &mut GenericThumbnail {
-        unimplemented!()
+    fn unsharpen(&mut self, sigma: f32, threshold: u32) -> &mut dyn GenericThumbnail {
+        self.ops.push(Box::new(UnsharpenOp::new(sigma, threshold)));
+        self
     }
 
-    fn crop(&mut self, c: Crop) -> &mut GenericThumbnail {
-        unimplemented!()
+    fn crop(&mut self, c: Crop) -> &mut dyn GenericThumbnail {
+        self.ops.push(Box::new(CropOp::new(c)));
+        self
     }
 
-    fn flip(&mut self, orientation: Orientation) -> &mut GenericThumbnail {
-        unimplemented!()
+    fn flip(&mut self, orientation: Orientation) -> &mut dyn GenericThumbnail {
+        self.ops.push(Box::new(FlipOp::new(orientation)));
+        self
     }
 
-    fn invert(&mut self) -> &mut GenericThumbnail {
-        unimplemented!()
+    fn invert(&mut self) -> &mut dyn GenericThumbnail {
+        self.ops.push(Box::new(InvertOp::new()));
+        self
     }
 
-    fn exif(&mut self, metadata: Exif) -> &mut GenericThumbnail {
-        unimplemented!()
+    fn exif(&mut self, metadata: Exif) -> &mut dyn GenericThumbnail {
+        self.ops.push(Box::new(ExifOp::new(metadata)));
+        self
     }
 
-    fn text(&mut self, text: String, pos: BoxPosition) -> &mut GenericThumbnail {
-        unimplemented!()
+    fn text(&mut self, text: String, pos: BoxPosition) -> &mut dyn GenericThumbnail {
+        self.ops.push(Box::new(TextOp::new(text, pos)));
+        self
     }
 
-    fn combine(&mut self, image: &StaticThumbnail, pos: BoxPosition) -> &mut GenericThumbnail {
-        unimplemented!()
+    fn combine(&mut self, image: StaticThumbnail, pos: BoxPosition) -> &mut dyn GenericThumbnail {
+        self.ops.push(Box::new(CombineOp::new(image, pos)));
+        self
     }
 }
