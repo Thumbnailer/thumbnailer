@@ -55,6 +55,7 @@ pub trait GenericThumbnail{
     fn brighten(&mut self, value: i32) -> &mut dyn GenericThumbnail;
     fn huerotate(&mut self, degree: i32) -> &mut dyn GenericThumbnail;
     fn contrast(&mut self, value: f32) -> &mut dyn GenericThumbnail;
+    fn unsharpen(&mut self, sigma: f32, threshold: u32) -> &mut dyn GenericThumbnail;
 
     fn crop(&mut self, c: Crop) -> &mut dyn GenericThumbnail;
     fn flip(&mut self, orientation: Orientation) -> &mut dyn GenericThumbnail;
@@ -65,5 +66,4 @@ pub trait GenericThumbnail{
     fn text(&mut self, text: str, pos: BoxPosition) -> &mut dyn GenericThumbnail;
 
     fn combine(&mut self, image: &StaticThumbnail, pos: BoxPosition) -> &mut dyn GenericThumbnail;
-
 }
