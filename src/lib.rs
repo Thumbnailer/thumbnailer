@@ -10,6 +10,7 @@ pub use crate::generic::GenericThumbnail;
 pub use crate::generic::{Resize, BoxPosition, Crop, Orientation, Exif, ResampleFilter};
 pub use crate::thumbnail::StaticThumbnail;
 pub use crate::thumbnail::SingleThumbnail;
+pub use crate::thumbnail::Thumbnail;
 
 mod generic;
 mod thumbnail;

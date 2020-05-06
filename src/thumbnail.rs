@@ -203,4 +203,18 @@ impl GenericThumbnail for Thumbnail<'_> {
         self.ops.push(Box::new(CombineOp::new(image, pos)));
         self
     }
+
+    fn apply(&mut self) -> &mut dyn GenericThumbnail{
+        self.assert_dynamic_image_loaded();
+
+        if let ImageData::Image(image) = &mut self.image {
+            for operation in &self.ops  {
+                operation.apply(image);
+            }
+        }
+
+        self.ops.clear();
+
+        self
+    }
 }
