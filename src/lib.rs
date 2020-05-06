@@ -13,3 +13,4 @@ pub use crate::thumbnail::SingleThumbnail;
 
 mod generic;
 mod thumbnail;
+mod errors;
