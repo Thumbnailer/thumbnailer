@@ -296,7 +296,35 @@ impl<'a> CombineOp {
 
 impl Operation for CombineOp {
     fn apply(&self, image: &mut DynamicImage) -> bool where Self: Sized {
-        unimplemented!()
+        let (pos_x, pos_y) = match self.pos {
+            BoxPosition::TopLeft(x, y) => (x, y),
+            BoxPosition::TopRight(x, y) => (x - self.image.get_width(), y),
+            BoxPosition::BottomLeft(x, y) => (x, y - self.image.get_height()),
+            BoxPosition::BottomRight(x, y) => (x - self.image.get_width(), y - self.image.get_height()),
+        };
+
+        let buffer_option = image.as_mut_rgba8();
+
+        let buffer_background = match buffer_option {
+            Some(rgba_image) => rgba_image,
+            None => return false,
+        };
+
+        match self.image.as_dyn().as_rgba8() {
+            Some(rgba_image) => {
+                for (x, y, pixel) in rgba_image.enumerate_pixels() {
+                    let background_pixel = buffer_background.get_pixel_mut(x + pos_x, y + pos_y);
+                    for index in 0..2{
+                        background_pixel[index] = pixel[3] * pixel[index] + (1 - pixel[3]) * background_pixel[index];
+                    }
+                }
+            },
+            None => {
+                return false
+            },
+        };
+
+        true
     }
 }
 

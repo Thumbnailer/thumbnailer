@@ -24,6 +24,20 @@ impl StaticThumbnail {
     pub fn as_dyn(&self) -> &DynamicImage {
         &self.image
     }
+
+    pub fn get_width(&self) -> u32 {
+        match self.as_dyn().as_rgb8() {
+            Some(rgb_image) => rgb_image.width(),
+            None => 0,
+        }
+    }
+
+    pub fn get_height(&self) -> u32 {
+        match self.as_dyn().as_rgb8() {
+            Some(rgb_image) => rgb_image.height(),
+            None => 0,
+        }
+    }
 }
 
 pub trait SingleThumbnail: GenericThumbnail {
