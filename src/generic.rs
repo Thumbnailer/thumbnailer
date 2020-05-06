@@ -47,8 +47,8 @@ pub enum ResampleFilter {
 
 
 pub trait GenericThumbnail{
-    fn resize(&mut self, size: &Resize) -> &mut dyn GenericThumbnail;
-    fn resize_filter(&mut self, size: &Resize, filter: ResampleFilter) -> &mut dyn GenericThumbnail;
+    fn resize(&mut self, size: Resize) -> &mut dyn GenericThumbnail;
+    fn resize_filter(&mut self, size: Resize, filter: ResampleFilter) -> &mut dyn GenericThumbnail;
 
 
     fn blur(&mut self, sigma: f32) -> &mut dyn GenericThumbnail;
