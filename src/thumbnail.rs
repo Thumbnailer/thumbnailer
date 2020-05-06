@@ -24,7 +24,7 @@ impl StaticThumbnail {
 }
 
 pub trait SingleThumbnail : GenericThumbnail {
-    fn as_static_copy(&self) -> &mut StaticThumbnail;
+    fn to_static_copy(self) -> Option<StaticThumbnail>;
 }
 
 pub struct Thumbnail<'a> {
@@ -109,3 +109,67 @@ impl Thumbnail<'_> {
 }
 
 
+impl SingleThumbnail for Thumbnail<'_> {
+    fn to_static_copy(self) -> Option<StaticThumbnail> {
+        match self.get_dyn_image() {
+            Ok(i) => Some(StaticThumbnail {
+                image: i.clone(),
+            }),
+            Err(_) => None,
+        }
+    }
+}
+
+impl GenericThumbnail for Thumbnail<'_> {
+    fn resize(&mut self, size: Resize) -> &mut GenericThumbnail {
+        unimplemented!()
+    }
+
+    fn resize_filter(&mut self, size: Resize, filter: ResampleFilter) -> &mut GenericThumbnail {
+        unimplemented!()
+    }
+
+    fn blur(&mut self, sigma: f32) -> &mut GenericThumbnail {
+        unimplemented!()
+    }
+
+    fn brighten(&mut self, value: i32) -> &mut GenericThumbnail {
+        unimplemented!()
+    }
+
+    fn huerotate(&mut self, degree: i32) -> &mut GenericThumbnail {
+        unimplemented!()
+    }
+
+    fn contrast(&mut self, value: f32) -> &mut GenericThumbnail {
+        unimplemented!()
+    }
+
+    fn unsharpen(&mut self, sigma: f32, threshold: u32) -> &mut GenericThumbnail {
+        unimplemented!()
+    }
+
+    fn crop(&mut self, c: Crop) -> &mut GenericThumbnail {
+        unimplemented!()
+    }
+
+    fn flip(&mut self, orientation: Orientation) -> &mut GenericThumbnail {
+        unimplemented!()
+    }
+
+    fn invert(&mut self) -> &mut GenericThumbnail {
+        unimplemented!()
+    }
+
+    fn exif(&mut self, metadata: Exif) -> &mut GenericThumbnail {
+        unimplemented!()
+    }
+
+    fn text(&mut self, text: String, pos: BoxPosition) -> &mut GenericThumbnail {
+        unimplemented!()
+    }
+
+    fn combine(&mut self, image: &StaticThumbnail, pos: BoxPosition) -> &mut GenericThumbnail {
+        unimplemented!()
+    }
+}
