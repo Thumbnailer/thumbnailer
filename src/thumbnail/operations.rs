@@ -2,8 +2,8 @@ use crate::generic::{BoxPosition, Crop, Exif, Orientation, ResampleFilter, Resiz
 use crate::thumbnail::{ImageData, Thumbnail};
 use crate::StaticThumbnail;
 use image::imageops::FilterType;
-use image::{DynamicImage, GenericImageView};
 use image::Pixel;
+use image::{DynamicImage, GenericImageView};
 use imageproc::drawing::draw_text_mut;
 use rusttype::{Font, Scale};
 
@@ -312,13 +312,10 @@ impl Operation for TextOp {
             BoxPosition::BottomRight(x, y) => (x, y),
         };
 
-        let scale = Scale {
-            x: 12.0,
-            y: 12.0
-        };
+        let scale = Scale { x: 12.0, y: 12.0 };
 
         let font_data: &[u8] = include_bytes!("../fonts/verdana.ttf");
-        let font: Font<'static> = match Font::from_bytes(font_data){
+        let font: Font<'static> = match Font::from_bytes(font_data) {
             Ok(font_bytes) => font_bytes,
             Err(_) => return false,
         };
@@ -330,7 +327,7 @@ impl Operation for TextOp {
             pos_y,
             scale,
             &font,
-            &self.text
+            &self.text,
         );
 
         true
