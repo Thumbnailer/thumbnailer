@@ -303,9 +303,7 @@ impl Operation for CombineOp {
             BoxPosition::BottomRight(x, y) => (x - self.image.get_width(), y - self.image.get_height()),
         };
 
-        let buffer_option = image.as_mut_rgba8();
-
-        let buffer_background = match buffer_option {
+        let buffer_background = match image.as_mut_rgba8() {
             Some(rgba_image) => rgba_image,
             None => return false,
         };
