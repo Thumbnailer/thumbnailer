@@ -7,11 +7,11 @@ mod tests {
 }
 
 pub use crate::generic::GenericThumbnail;
-pub use crate::generic::{Resize, BoxPosition, Crop, Orientation, Exif, ResampleFilter};
-pub use crate::thumbnail::StaticThumbnail;
+pub use crate::generic::{BoxPosition, Crop, Exif, Orientation, ResampleFilter, Resize};
 pub use crate::thumbnail::SingleThumbnail;
+pub use crate::thumbnail::StaticThumbnail;
 pub use crate::thumbnail::Thumbnail;
 
+mod errors;
 mod generic;
 mod thumbnail;
-mod errors;

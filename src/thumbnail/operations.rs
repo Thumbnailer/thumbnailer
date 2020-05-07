@@ -1,10 +1,10 @@
-use crate::thumbnail::{Thumbnail, ImageData};
-use crate::generic::{Resize, ResampleFilter, Crop, Orientation, Exif, BoxPosition};
+use crate::generic::{BoxPosition, Crop, Exif, Orientation, ResampleFilter, Resize};
+use crate::thumbnail::{ImageData, Thumbnail};
 use crate::StaticThumbnail;
 use image::imageops::FilterType;
 use image::{DynamicImage, GenericImageView};
 
-pub trait Operation: OperationClone{
+pub trait Operation: OperationClone {
     fn apply(&self, image: &mut DynamicImage) -> bool;
 }
 
@@ -12,7 +12,10 @@ pub trait OperationClone {
     fn box_clone(&self) -> Box<dyn Operation>;
 }
 
-impl<T> OperationClone for T where T: 'static + Operation + Clone {
+impl<T> OperationClone for T
+where
+    T: 'static + Operation + Clone,
+{
     fn box_clone(&self) -> Box<dyn Operation> {
         Box::new(self.clone())
     }
@@ -38,12 +41,11 @@ impl ResizeOp {
 
 impl Operation for ResizeOp {
     fn apply(&self, image: &mut DynamicImage) -> bool {
-
         let aspect_ratio = match image.as_rgb8() {
             Some(rgb_image) => rgb_image.width() as f32 / rgb_image.height() as f32,
             _ => return false,
         };
-    
+
         let filter_type = match self.filter {
             Some(ResampleFilter::Nearest) => Some(FilterType::Nearest),
             Some(ResampleFilter::Triangle) => Some(FilterType::Triangle),
@@ -52,44 +54,44 @@ impl Operation for ResizeOp {
             Some(ResampleFilter::Lanczos3) => Some(FilterType::Lanczos3),
             None => None,
         };
-    
+
         match filter_type {
             Some(image_filter) => {
                 match self.size {
                     Resize::Height(y) => {
                         let x: u32 = (aspect_ratio * y as f32) as u32 + 1;
                         *image = image.resize(x, y, image_filter);
-                    },
+                    }
                     Resize::Width(x) => {
                         let y: u32 = (x as f32 / aspect_ratio) as u32 + 1;
                         *image = image.resize(x, y, image_filter);
-                    },
+                    }
                     Resize::BoundingBox(x, y) => {
                         *image = image.resize(x, y, image_filter);
-                    },
+                    }
                     Resize::ExactBox(x, y) => {
                         *image = image.resize_exact(x, y, image_filter);
-                    },
+                    }
                 };
-            },
+            }
             None => {
                 match self.size {
                     Resize::Height(y) => {
                         let x: u32 = (aspect_ratio * y as f32) as u32 + 1;
                         *image = image.thumbnail(x, y);
-                    },
+                    }
                     Resize::Width(x) => {
                         let y: u32 = (x as f32 / aspect_ratio) as u32 + 1;
                         *image = image.thumbnail(x, y);
-                    },
+                    }
                     Resize::BoundingBox(x, y) => {
                         *image = image.thumbnail(x, y);
-                    },
+                    }
                     Resize::ExactBox(x, y) => {
                         *image = image.thumbnail_exact(x, y);
-                    },
+                    }
                 };
-            },
+            }
         };
 
         true
@@ -108,13 +110,12 @@ impl CropOp {
 
 impl Operation for CropOp {
     fn apply(&self, image: &mut DynamicImage) -> bool {
-
         let (width, height) = image.dimensions();
 
         match self.crop {
             Crop::Box(x, y, w, h) => {
                 *image = image.crop(x, y, w, h);
-            },
+            }
             Crop::Ratio(w_r, h_r) => {
                 let ratio_old = width as f32 / height as f32;
                 let ratio_new = w_r / h_r;
@@ -124,14 +125,13 @@ impl Operation for CropOp {
                     let y_new = (height - height_new) / 2;
 
                     *image = image.crop(0, y_new, width, height_new);
-                }
-                else {
+                } else {
                     let width_new = ((ratio_new / ratio_old) * width as f32) as u32;
                     let x_new = (width - width_new) / 2;
 
                     *image = image.crop(x_new, 0, width_new, height);
                 }
-            },
+            }
         }
         true
     }
@@ -149,7 +149,10 @@ impl BlurOp {
 }
 
 impl Operation for BlurOp {
-    fn apply(&self, image: &mut DynamicImage) -> bool where Self: Sized {
+    fn apply(&self, image: &mut DynamicImage) -> bool
+    where
+        Self: Sized,
+    {
         *image = image.blur(self.sigma);
         true
     }
@@ -167,7 +170,10 @@ impl BrightenOp {
 }
 
 impl Operation for BrightenOp {
-    fn apply(&self, image: &mut DynamicImage) -> bool where Self: Sized {
+    fn apply(&self, image: &mut DynamicImage) -> bool
+    where
+        Self: Sized,
+    {
         *image = image.brighten(self.value);
         true
     }
@@ -185,7 +191,10 @@ impl HuerotateOp {
 }
 
 impl Operation for HuerotateOp {
-    fn apply(&self, image: &mut DynamicImage) -> bool where Self: Sized {
+    fn apply(&self, image: &mut DynamicImage) -> bool
+    where
+        Self: Sized,
+    {
         *image = image.huerotate(self.degree);
         true
     }
@@ -203,7 +212,10 @@ impl ContrastOp {
 }
 
 impl Operation for ContrastOp {
-    fn apply(&self, image: &mut DynamicImage) -> bool where Self: Sized {
+    fn apply(&self, image: &mut DynamicImage) -> bool
+    where
+        Self: Sized,
+    {
         *image = image.adjust_contrast(self.value);
         true
     }
@@ -221,7 +233,10 @@ impl FlipOp {
 }
 
 impl Operation for FlipOp {
-    fn apply(&self, image: &mut DynamicImage) -> bool where Self: Sized {
+    fn apply(&self, image: &mut DynamicImage) -> bool
+    where
+        Self: Sized,
+    {
         match self.orientation {
             Orientation::Vertical => *image = image.flipv(),
             Orientation::Horizontal => *image = image.fliph(),
@@ -241,7 +256,10 @@ impl InvertOp {
 }
 
 impl Operation for InvertOp {
-    fn apply(&self, image: &mut DynamicImage) -> bool where Self: Sized {
+    fn apply(&self, image: &mut DynamicImage) -> bool
+    where
+        Self: Sized,
+    {
         image.invert();
         true
     }
@@ -259,7 +277,10 @@ impl ExifOp {
 }
 
 impl Operation for ExifOp {
-    fn apply(&self, image: &mut DynamicImage) -> bool where Self: Sized {
+    fn apply(&self, image: &mut DynamicImage) -> bool
+    where
+        Self: Sized,
+    {
         unimplemented!()
     }
 }
@@ -277,7 +298,10 @@ impl TextOp {
 }
 
 impl Operation for TextOp {
-    fn apply(&self, image: &mut DynamicImage) -> bool where Self: Sized {
+    fn apply(&self, image: &mut DynamicImage) -> bool
+    where
+        Self: Sized,
+    {
         unimplemented!()
     }
 }
@@ -285,7 +309,7 @@ impl Operation for TextOp {
 #[derive(Clone)]
 pub(crate) struct CombineOp {
     image: StaticThumbnail,
-    pos: BoxPosition
+    pos: BoxPosition,
 }
 
 impl<'a> CombineOp {
@@ -295,12 +319,17 @@ impl<'a> CombineOp {
 }
 
 impl Operation for CombineOp {
-    fn apply(&self, image: &mut DynamicImage) -> bool where Self: Sized {
+    fn apply(&self, image: &mut DynamicImage) -> bool
+    where
+        Self: Sized,
+    {
         let (pos_x, pos_y) = match self.pos {
             BoxPosition::TopLeft(x, y) => (x, y),
             BoxPosition::TopRight(x, y) => (x - self.image.get_width(), y),
             BoxPosition::BottomLeft(x, y) => (x, y - self.image.get_height()),
-            BoxPosition::BottomRight(x, y) => (x - self.image.get_width(), y - self.image.get_height()),
+            BoxPosition::BottomRight(x, y) => {
+                (x - self.image.get_width(), y - self.image.get_height())
+            }
         };
 
         let buffer_background = match image.as_mut_rgba8() {
@@ -312,14 +341,13 @@ impl Operation for CombineOp {
             Some(rgba_image) => {
                 for (x, y, pixel) in rgba_image.enumerate_pixels() {
                     let background_pixel = buffer_background.get_pixel_mut(x + pos_x, y + pos_y);
-                    for index in 0..2{
-                        background_pixel[index] = pixel[3] * pixel[index] + (1 - pixel[3]) * background_pixel[index];
+                    for index in 0..2 {
+                        background_pixel[index] =
+                            pixel[3] * pixel[index] + (1 - pixel[3]) * background_pixel[index];
                     }
                 }
-            },
-            None => {
-                return false
-            },
+            }
+            None => return false,
         };
 
         true
@@ -329,7 +357,7 @@ impl Operation for CombineOp {
 #[derive(Copy, Clone)]
 pub(crate) struct UnsharpenOp {
     sigma: f32,
-    threshold: i32
+    threshold: i32,
 }
 
 impl UnsharpenOp {
@@ -339,7 +367,10 @@ impl UnsharpenOp {
 }
 
 impl Operation for UnsharpenOp {
-    fn apply(&self, image: &mut DynamicImage) -> bool where Self: Sized {
+    fn apply(&self, image: &mut DynamicImage) -> bool
+    where
+        Self: Sized,
+    {
         *image = image.unsharpen(self.sigma, self.threshold);
         true
     }
