@@ -183,7 +183,7 @@ impl GenericThumbnail for Thumbnail<'_> {
         self
     }
 
-    fn unsharpen(&mut self, sigma: f32, threshold: u32) -> &mut dyn GenericThumbnail {
+    fn unsharpen(&mut self, sigma: f32, threshold: i32) -> &mut dyn GenericThumbnail {
         self.ops.push(Box::new(UnsharpenOp::new(sigma, threshold)));
         self
     }
