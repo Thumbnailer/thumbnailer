@@ -5,35 +5,35 @@ pub enum Resize {
     Height(u32),
     Width(u32),
     BoundingBox(u32, u32),
-    ExactBox(u32, u32)
+    ExactBox(u32, u32),
 }
 
 #[derive(Debug, Copy, Clone)]
 pub enum BoxPosition {
-     TopLeft(u32, u32),
-     TopRight(u32, u32),
-     BottomLeft(u32, u32),
-     BottomRight(u32, u32)
+    TopLeft(u32, u32),
+    TopRight(u32, u32),
+    BottomLeft(u32, u32),
+    BottomRight(u32, u32),
 }
 
 #[derive(Debug, Copy, Clone)]
 pub enum Crop {
     Box(u32, u32, u32, u32),
-    Ratio(f32, f32)
+    Ratio(f32, f32),
 }
 
 #[derive(Debug, Copy, Clone)]
 pub enum Orientation {
     Vertical,
-    Horizontal
+    Horizontal,
 }
 
 #[derive(Debug, Clone)]
 pub enum Exif {
-     Keep,
-     Clear,
-     Whitelist(Vec<u16>),
-     Blacklist(Vec<u16>)
+    Keep,
+    Clear,
+    Whitelist(Vec<u16>),
+    Blacklist(Vec<u16>),
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -45,11 +45,9 @@ pub enum ResampleFilter {
     Lanczos3,
 }
 
-
-pub trait GenericThumbnail{
+pub trait GenericThumbnail {
     fn resize(&mut self, size: Resize) -> &mut dyn GenericThumbnail;
     fn resize_filter(&mut self, size: Resize, filter: ResampleFilter) -> &mut dyn GenericThumbnail;
-
 
     fn blur(&mut self, sigma: f32) -> &mut dyn GenericThumbnail;
     fn brighten(&mut self, value: i32) -> &mut dyn GenericThumbnail;

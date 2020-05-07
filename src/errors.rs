@@ -1,9 +1,8 @@
+use image::ImageError;
+use std::error::Error;
+use std::fmt::Formatter;
 use std::path::Path;
 use std::{fmt, io};
-use std::fmt::{Formatter};
-use std::error::Error;
-use image::ImageError;
-
 
 #[derive(Debug)]
 pub enum FileError<'a> {
@@ -37,7 +36,6 @@ impl Error for UnknownError {
     }
 }
 
-
 #[derive(Debug, Clone)]
 pub struct FileNotFoundError<'a> {
     pub path: &'a Path,
@@ -45,7 +43,11 @@ pub struct FileNotFoundError<'a> {
 
 impl fmt::Display for FileNotFoundError<'_> {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "File could not be found at path: {}", self.path.display())
+        write!(
+            f,
+            "File could not be found at path: {}",
+            self.path.display()
+        )
     }
 }
 
@@ -61,7 +63,11 @@ pub struct FileNotSupportedError<'a> {
 
 impl fmt::Display for FileNotSupportedError<'_> {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "File is not of a supported type: {}", self.path.display())
+        write!(
+            f,
+            "File is not of a supported type: {}",
+            self.path.display()
+        )
     }
 }
 
