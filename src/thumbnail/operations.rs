@@ -329,17 +329,18 @@ impl Operation for CombineOp {
 #[derive(Copy, Clone)]
 pub(crate) struct UnsharpenOp {
     sigma: f32,
-    threshold: u32
+    threshold: i32
 }
 
 impl UnsharpenOp {
-    pub fn new(sigma: f32, threshold: u32) -> Self {
+    pub fn new(sigma: f32, threshold: i32) -> Self {
         UnsharpenOp { sigma, threshold }
     }
 }
 
 impl Operation for UnsharpenOp {
     fn apply(&self, image: &mut DynamicImage) -> bool where Self: Sized {
-        unimplemented!()
+        *image = image.unsharpen(self.sigma, self.threshold);
+        true
     }
 }
