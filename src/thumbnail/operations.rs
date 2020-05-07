@@ -3,6 +3,9 @@ use crate::thumbnail::{ImageData, Thumbnail};
 use crate::StaticThumbnail;
 use image::imageops::FilterType;
 use image::{DynamicImage, GenericImageView};
+use image::Pixel;
+use imageproc::drawing::draw_text_mut;
+use rusttype::{Font, Scale};
 
 pub trait Operation: OperationClone {
     fn apply(&self, image: &mut DynamicImage) -> bool;
@@ -302,7 +305,35 @@ impl Operation for TextOp {
     where
         Self: Sized,
     {
-        unimplemented!()
+        let (pos_x, pos_y) = match self.pos {
+            BoxPosition::TopLeft(x, y) => (x, y),
+            BoxPosition::TopRight(x, y) => (x, y),
+            BoxPosition::BottomLeft(x, y) => (x, y),
+            BoxPosition::BottomRight(x, y) => (x, y),
+        };
+
+        let scale = Scale {
+            x: 12.0,
+            y: 12.0
+        };
+
+        let font_data: &[u8] = include_bytes!("../../resources/fonts/Roboto-Regular.ttf");
+        let font: Font<'static> = match Font::from_bytes(font_data){
+            Ok(font_bytes) => font_bytes,
+            Err(_) => return false,
+        };
+
+        draw_text_mut(
+            image,
+            Pixel::from_channels(255u8, 255u8, 255u8, 255u8),
+            pos_x,
+            pos_y,
+            scale,
+            &font,
+            &self.text
+        );
+
+        true
     }
 }
 
