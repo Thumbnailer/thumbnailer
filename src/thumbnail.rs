@@ -1,17 +1,16 @@
-use image::{DynamicImage, io::Reader, ImageFormat};
-use crate::{
-    generic::{GenericThumbnail, Crop, Exif, Resize, BoxPosition, Orientation, ResampleFilter},
-    thumbnail::operations::{Operation},
-    errors::{FileNotFoundError, FileNotSupportedError, FileError, InternalError},
-    errors,
+use crate::thumbnail::operations::{
+    BlurOp, BrightenOp, CombineOp, ContrastOp, CropOp, ExifOp, FlipOp, HuerotateOp, InvertOp,
+    ResizeOp, TextOp, UnsharpenOp,
 };
-use std::{
-    path::Path,
-    io::BufReader,
-    fs::File,
-};
-use crate::thumbnail::operations::{ResizeOp, BlurOp, BrightenOp, HuerotateOp, ContrastOp, UnsharpenOp, CropOp, FlipOp, InvertOp, ExifOp, TextOp, CombineOp};
 use crate::thumbnail::ImageData::Image;
+use crate::{
+    errors,
+    errors::{FileError, FileNotFoundError, FileNotSupportedError, InternalError},
+    generic::{BoxPosition, Crop, Exif, GenericThumbnail, Orientation, ResampleFilter, Resize},
+    thumbnail::operations::Operation,
+};
+use image::{io::Reader, DynamicImage, ImageFormat};
+use std::{fs::File, io::BufReader, path::Path};
 
 mod operations;
 
@@ -46,7 +45,7 @@ pub trait SingleThumbnail: GenericThumbnail {
 //TODO: #[derive(Clone)]
 enum ImageData {
     File(File, ImageFormat),
-    Image(DynamicImage)
+    Image(DynamicImage),
 }
 
 //TODO: #[derive(Clone)]
@@ -61,14 +60,12 @@ pub struct Thumbnail<'a> {
 impl Thumbnail<'_> {
     pub fn load(path: &Path) -> Result<Thumbnail, FileError> {
         if !path.is_file() {
-            return Err(FileError::NotFound(FileNotFoundError {
-                path,
-            }));
+            return Err(FileError::NotFound(FileNotFoundError { path }));
         }
 
-        let file= match File::open(path) {
+        let file = match File::open(path) {
             Ok(f) => f,
-            Err(e) => return Err(FileError::IoError(e))
+            Err(e) => return Err(FileError::IoError(e)),
         };
 
         let buffer = BufReader::new(file);
@@ -77,21 +74,19 @@ impl Thumbnail<'_> {
         // because a method call borrows self and then returns it again within a Result
         let mut reader = Reader::new(buffer);
 
-        let format  = match reader.format() {
+        let format = match reader.format() {
             Some(f) => f,
             None => {
                 // with_guessed_format() returns Result<Self>,
                 // to keep ownership of reader we need to extract it from the result again
                 reader = match reader.with_guessed_format() {
                     Err(error) => return Err(FileError::IoError(error)),
-                    Ok(reader) => reader
+                    Ok(reader) => reader,
                 };
 
                 match reader.format() {
                     Some(f) => f,
-                    None => return Err(FileError::NotSupported(FileNotSupportedError {
-                        path,
-                    }))
+                    None => return Err(FileError::NotSupported(FileNotSupportedError { path })),
                 }
             }
         };
@@ -114,39 +109,35 @@ impl Thumbnail<'_> {
             Err(_) => return false,
             Ok(reader) => match reader.format() {
                 Some(_) => true,
-                None => false
+                None => false,
             },
         }
     }
 
     fn get_dyn_image<'a>(&mut self) -> Result<&mut image::DynamicImage, InternalError> {
-
         if let (ImageData::File(file, _)) = &self.image {
             let reader = Reader::new(BufReader::new(file));
             self.image = ImageData::Image(reader.decode()?);
         }
 
-        return match  &mut self.image {
+        return match &mut self.image {
             ImageData::Image(image) => Ok(image),
-            ImageData::File(file, _) => Err(InternalError::UnknownError(errors::UnknownError))
+            ImageData::File(file, _) => Err(InternalError::UnknownError(errors::UnknownError)),
         };
     }
 
     fn assert_dynamic_image_loaded(&mut self) -> bool {
         match self.get_dyn_image() {
             Ok(_) => true,
-            Err(_) => false
+            Err(_) => false,
         }
     }
 }
 
-
 impl SingleThumbnail for Thumbnail<'_> {
     fn to_static_copy(&mut self) -> Option<StaticThumbnail> {
         match self.get_dyn_image() {
-            Ok(i) => Some(StaticThumbnail {
-                image: i.clone(),
-            }),
+            Ok(i) => Some(StaticThumbnail { image: i.clone() }),
             Err(_) => None,
         }
     }
@@ -159,7 +150,8 @@ impl GenericThumbnail for Thumbnail<'_> {
     }
 
     fn resize_filter(&mut self, size: Resize, filter: ResampleFilter) -> &mut dyn GenericThumbnail {
-        self.ops.push(Box::new(ResizeOp::new(size, Option::from(filter))));
+        self.ops
+            .push(Box::new(ResizeOp::new(size, Option::from(filter))));
         self
     }
 
@@ -218,11 +210,11 @@ impl GenericThumbnail for Thumbnail<'_> {
         self
     }
 
-    fn apply(&mut self) -> &mut dyn GenericThumbnail{
+    fn apply(&mut self) -> &mut dyn GenericThumbnail {
         self.assert_dynamic_image_loaded();
 
         if let ImageData::Image(image) = &mut self.image {
-            for operation in &self.ops  {
+            for operation in &self.ops {
                 operation.apply(image);
             }
         }
