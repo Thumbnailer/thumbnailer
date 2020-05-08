@@ -5,8 +5,10 @@ use image::{DynamicImage, GenericImageView};
 use image::Pixel;
 use imageproc::drawing::draw_text_mut;
 use rusttype::{Font, Scale};
+use std::fmt;
+use std::fmt::{Debug, Formatter};
 
-pub trait Operation: OperationClone {
+pub trait Operation: OperationClone + Debug {
     fn apply(&self, image: &mut DynamicImage) -> bool;
 }
 
@@ -29,7 +31,7 @@ impl Clone for Box<dyn Operation> {
     }
 }
 
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 /// Representation of the resizing operation as a struct
 pub struct ResizeOp {
     /// Contains the `Resize` enum as option
@@ -133,7 +135,7 @@ impl Operation for ResizeOp {
         true
     }
 }
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 /// Representation of the crop-operation as a struct
 pub struct CropOp {
     /// contains the `Crop` enum as option
@@ -208,7 +210,7 @@ impl Operation for CropOp {
     }
 }
 
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 /// Representation of the blur-operation as a struct
 pub struct BlurOp {
     /// Value that specifies how much the image should be blurred.
@@ -260,7 +262,7 @@ impl Operation for BlurOp {
     }
 }
 
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 /// Representation of the brighten-operation as a struct.
 pub struct BrightenOp {
     /// Value of how much the image should be brightened.
@@ -312,7 +314,7 @@ impl Operation for BrightenOp {
     }
 }
 
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 pub struct HuerotateOp {
     degree: i32,
 }
@@ -333,7 +335,7 @@ impl Operation for HuerotateOp {
     }
 }
 
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 /// Representation of the contrast-operation as a struct.
 pub struct ContrastOp {
     /// Value of how much the contrast should be adjusted.
@@ -385,7 +387,7 @@ impl Operation for ContrastOp {
     }
 }
 
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 /// Representation of the flip-operation as struct
 pub struct FlipOp {
     /// contains the `Orientation` enum
@@ -444,7 +446,7 @@ impl Operation for FlipOp {
     }
 }
 
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 /// Representation of the invert-operation as struct
 pub struct InvertOp;
 
@@ -491,7 +493,7 @@ impl Operation for InvertOp {
     }
 }
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct ExifOp {
     metadata: Exif,
 }
@@ -511,7 +513,7 @@ impl Operation for ExifOp {
     }
 }
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 /// Representation of the operation of drawing texts as a struct
 pub struct TextOp {
     /// The text that should be drawn
@@ -726,7 +728,18 @@ impl Operation for CombineOp {
     }
 }
 
-#[derive(Copy, Clone)]
+impl fmt::Debug for CombineOp {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "CombineOp: StaticThumbnail {} at pos {:?}",
+            self.image.src_path.to_str().unwrap_or_default(),
+            self.pos
+        )
+    }
+}
+
+#[derive(Debug, Copy, Clone)]
 /// Representation of the unsharpen-operation as a struct
 pub struct UnsharpenOp {
     /// amount to blur the image by
