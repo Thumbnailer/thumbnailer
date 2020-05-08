@@ -1,10 +1,15 @@
 use crate::StaticThumbnail;
 
 #[derive(Debug, Copy, Clone)]
+/// The different options for the resize-operation as an enum
 pub enum Resize {
+    /// Option: scale to a given height, keep aspect ratio
     Height(u32),
+    /// Option: scale to a given width, keep aspect ratio
     Width(u32),
+    /// Option: scale the image so that it fits inside the box given by width and height, keep aspect ratio
     BoundingBox(u32, u32),
+    /// Option: scale the image to the given width and height exactly, aspect ratio may be changed
     ExactBox(u32, u32),
 }
 
