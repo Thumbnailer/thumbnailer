@@ -1,3 +1,7 @@
+use crate::thumbnail::operations::{
+    BlurOp, BrightenOp, CombineOp, ContrastOp, CropOp, ExifOp, FlipOp, HuerotateOp, InvertOp,
+    Operation, ResizeOp, TextOp, UnsharpenOp,
+};
 use crate::StaticThumbnail;
 
 #[derive(Debug, Copy, Clone)]
@@ -98,7 +102,15 @@ pub enum ResampleFilter {
     Lanczos3,
 }
 
-pub trait GenericThumbnail {
+pub trait OperationContainer {
+    fn add_op(&mut self, op: Box<dyn Operation>);
+}
+
+pub trait GenericThumbnail: GenericThumbnailOperations {
+    fn apply(&mut self) -> &mut dyn GenericThumbnail;
+}
+
+pub trait GenericThumbnailOperations {
     fn resize(&mut self, size: Resize) -> &mut dyn GenericThumbnail;
     fn resize_filter(&mut self, size: Resize, filter: ResampleFilter) -> &mut dyn GenericThumbnail;
 
@@ -117,6 +129,74 @@ pub trait GenericThumbnail {
     fn text(&mut self, text: String, pos: BoxPosition) -> &mut dyn GenericThumbnail;
 
     fn combine(&mut self, image: StaticThumbnail, pos: BoxPosition) -> &mut dyn GenericThumbnail;
+}
 
-    fn apply(&mut self) -> &mut dyn GenericThumbnail;
+impl<T> GenericThumbnailOperations for T
+where
+    T: OperationContainer + GenericThumbnail,
+{
+    fn resize(&mut self, size: Resize) -> &mut dyn GenericThumbnail {
+        self.add_op(Box::new(ResizeOp::new(size, None)));
+        self
+    }
+
+    fn resize_filter(&mut self, size: Resize, filter: ResampleFilter) -> &mut dyn GenericThumbnail {
+        self.add_op(Box::new(ResizeOp::new(size, Option::from(filter))));
+        self
+    }
+
+    fn blur(&mut self, sigma: f32) -> &mut dyn GenericThumbnail {
+        self.add_op(Box::new(BlurOp::new(sigma)));
+        self
+    }
+
+    fn brighten(&mut self, value: i32) -> &mut dyn GenericThumbnail {
+        self.add_op(Box::new(BrightenOp::new(value)));
+        self
+    }
+
+    fn huerotate(&mut self, degree: i32) -> &mut dyn GenericThumbnail {
+        self.add_op(Box::new(HuerotateOp::new(degree)));
+        self
+    }
+
+    fn contrast(&mut self, value: f32) -> &mut dyn GenericThumbnail {
+        self.add_op(Box::new(ContrastOp::new(value)));
+        self
+    }
+
+    fn unsharpen(&mut self, sigma: f32, threshold: i32) -> &mut dyn GenericThumbnail {
+        self.add_op(Box::new(UnsharpenOp::new(sigma, threshold)));
+        self
+    }
+
+    fn crop(&mut self, c: Crop) -> &mut dyn GenericThumbnail {
+        self.add_op(Box::new(CropOp::new(c)));
+        self
+    }
+
+    fn flip(&mut self, orientation: Orientation) -> &mut dyn GenericThumbnail {
+        self.add_op(Box::new(FlipOp::new(orientation)));
+        self
+    }
+
+    fn invert(&mut self) -> &mut dyn GenericThumbnail {
+        self.add_op(Box::new(InvertOp::new()));
+        self
+    }
+
+    fn exif(&mut self, metadata: Exif) -> &mut dyn GenericThumbnail {
+        self.add_op(Box::new(ExifOp::new(metadata)));
+        self
+    }
+
+    fn text(&mut self, text: String, pos: BoxPosition) -> &mut dyn GenericThumbnail {
+        self.add_op(Box::new(TextOp::new(text, pos)));
+        self
+    }
+
+    fn combine(&mut self, image: StaticThumbnail, pos: BoxPosition) -> &mut dyn GenericThumbnail {
+        self.add_op(Box::new(CombineOp::new(image, pos)));
+        self
+    }
 }
