@@ -15,11 +15,11 @@ pub enum FileError {
 impl std::convert::From<InternalError> for FileError {
     fn from(err: InternalError) -> Self {
         match err {
-            InternalError::UnknownError(err)  => FileError::UnknownError(err),
+            InternalError::UnknownError(err) => FileError::UnknownError(err),
             InternalError::ImageError(err) => match err {
                 ImageError::IoError(err) => FileError::IoError(err),
-                _ => FileError::UnknownError(UnknownError)
-            }
+                _ => FileError::UnknownError(UnknownError),
+            },
         }
     }
 }
@@ -87,5 +87,22 @@ impl fmt::Display for FileNotSupportedError {
 impl Error for FileNotSupportedError {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         None
+    }
+}
+
+pub enum CollectionError {
+    FileError(FileError),
+    GlobError(globwalk::GlobError),
+}
+
+impl std::convert::From<FileError> for CollectionError {
+    fn from(error: FileError) -> Self {
+        CollectionError::FileError(error)
+    }
+}
+
+impl std::convert::From<globwalk::GlobError> for CollectionError {
+    fn from(error: globwalk::GlobError) -> Self {
+        CollectionError::GlobError(error)
     }
 }
