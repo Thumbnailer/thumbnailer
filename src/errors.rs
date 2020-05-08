@@ -1,13 +1,13 @@
 use image::ImageError;
 use std::error::Error;
 use std::fmt::Formatter;
-use std::path::Path;
+use std::path::PathBuf;
 use std::{fmt, io};
 
 #[derive(Debug)]
-pub enum FileError<'a> {
-    NotFound(FileNotFoundError<'a>),
-    NotSupported(FileNotSupportedError<'a>),
+pub enum FileError {
+    NotFound(FileNotFoundError),
+    NotSupported(FileNotSupportedError),
     IoError(io::Error),
 }
 
@@ -37,11 +37,11 @@ impl Error for UnknownError {
 }
 
 #[derive(Debug, Clone)]
-pub struct FileNotFoundError<'a> {
-    pub path: &'a Path,
+pub struct FileNotFoundError {
+    pub path: PathBuf,
 }
 
-impl fmt::Display for FileNotFoundError<'_> {
+impl fmt::Display for FileNotFoundError {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(
             f,
@@ -51,17 +51,17 @@ impl fmt::Display for FileNotFoundError<'_> {
     }
 }
 
-impl Error for FileNotFoundError<'_> {
+impl Error for FileNotFoundError {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         None
     }
 }
 #[derive(Debug, Clone)]
-pub struct FileNotSupportedError<'a> {
-    pub path: &'a Path,
+pub struct FileNotSupportedError {
+    pub path: PathBuf,
 }
 
-impl fmt::Display for FileNotSupportedError<'_> {
+impl fmt::Display for FileNotSupportedError {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(
             f,
@@ -71,7 +71,7 @@ impl fmt::Display for FileNotSupportedError<'_> {
     }
 }
 
-impl Error for FileNotSupportedError<'_> {
+impl Error for FileNotSupportedError {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         None
     }
