@@ -305,19 +305,44 @@ impl Operation for TextOp {
     where
         Self: Sized,
     {
-        let (pos_x, pos_y) = match self.pos {
-            BoxPosition::TopLeft(x, y) => (x, y),
-            BoxPosition::TopRight(x, y) => (x, y),
-            BoxPosition::BottomLeft(x, y) => (x, y),
-            BoxPosition::BottomRight(x, y) => (x, y),
-        };
-
         let scale = Scale { x: 12.0, y: 12.0 };
 
         let font_data: &[u8] = include_bytes!("../fonts/verdana.ttf");
         let font: Font<'static> = match Font::from_bytes(font_data) {
             Ok(font_bytes) => font_bytes,
             Err(_) => return false,
+        };
+
+        let mut string_width = 0.0;
+        let string_height = font.v_metrics(scale).ascent - font.v_metrics(scale).descent;
+
+        for glyph in font.glyphs_for(self.text.chars()) {
+            string_width += glyph.scaled(scale).h_metrics().advance_width;
+        }
+
+        let (pos_x, pos_y) = match self.pos {
+            BoxPosition::TopLeft(x, y) => (x, y),
+            BoxPosition::TopRight(x, y) => {
+                if x >= string_width as u32 {
+                    (x - string_width as u32, y)
+                } else {
+                    return false;
+                }
+            }
+            BoxPosition::BottomLeft(x, y) => {
+                if y >= string_height as u32 {
+                    (x, y - string_height as u32)
+                } else {
+                    return false;
+                }
+            }
+            BoxPosition::BottomRight(x, y) => {
+                if x >= string_width as u32 && y >= string_height as u32 {
+                    (x - string_width as u32, y - string_height as u32)
+                } else {
+                    return false;
+                }
+            }
         };
 
         draw_text_mut(
