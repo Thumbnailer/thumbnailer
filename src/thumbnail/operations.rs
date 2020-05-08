@@ -378,10 +378,26 @@ impl Operation for CombineOp {
     {
         let (pos_x, pos_y) = match self.pos {
             BoxPosition::TopLeft(x, y) => (x, y),
-            BoxPosition::TopRight(x, y) => (x - self.image.get_width(), y),
-            BoxPosition::BottomLeft(x, y) => (x, y - self.image.get_height()),
+            BoxPosition::TopRight(x, y) => {
+                if x >= self.image.get_width() {
+                    (x - self.image.get_width(), y)
+                } else {
+                    return false;
+                }
+            }
+            BoxPosition::BottomLeft(x, y) => {
+                if y >= self.image.get_height() {
+                    (x, y - self.image.get_height())
+                } else {
+                    return false;
+                }
+            }
             BoxPosition::BottomRight(x, y) => {
-                (x - self.image.get_width(), y - self.image.get_height())
+                if x >= self.image.get_width() && y >= self.image.get_height() {
+                    (x - self.image.get_width(), y - self.image.get_height())
+                } else {
+                    return false;
+                }
             }
         };
 
