@@ -56,26 +56,27 @@ impl Operation for ResizeOp {
     ///
     /// # Arguments
     ///
-    /// * '&self' - The ResizeOp-struct
-    /// * 'image' - The DynamicImage that should be resized
+    /// * `&self` - The ResizeOp-struct
+    /// * `image` - The DynamicImage that should be resized
     ///
     /// # Panic
     ///
     /// This function won't panic ?
     ///
     /// # Examples
-    /// '''
-    /// use Thumbnailer::generic::{Resize, ResampleFilter};
-    /// use Thumbnailer::operations::ResizeOp
+    /// ```
+    /// use thumbnailer::generic::{Resize, ResampleFilter};
+    /// use thumbnailer::thumbnail::operations::Operation;
+    /// use thumbnailer::thumbnail::operations::ResizeOp;
     /// use image::DynamicImage;
     ///
     /// let size = Resize::BoundingBox(400, 300);
     /// let filter = ResampleFilter::Gaussian;
-    /// let dynamic_image = DynamicImage::new_rgb8(800, 500);
+    /// let mut dynamic_image = DynamicImage::new_rgb8(800, 500);
     ///
-    /// let resize_op = ResizeOp::new(size, filter);
-    /// resize_op.apply(dynamic_image);
-    /// '''
+    /// let resize_op = ResizeOp::new(size, Some(filter));
+    /// resize_op.apply(&mut dynamic_image);
+    /// ```
     fn apply(&self, image: &mut DynamicImage) -> bool {
         let aspect_ratio = match image.as_rgb8() {
             Some(rgb_image) => rgb_image.width() as f32 / rgb_image.height() as f32,
@@ -160,25 +161,26 @@ impl Operation for CropOp {
     ///
     /// # Arguments
     ///
-    /// * '&self' - The CropOp-struct
-    /// * 'image' - The DynamicImage that should be cropped
+    /// * `&self` - The CropOp-struct
+    /// * `image` - The DynamicImage that should be cropped
     ///
     /// # Panic
     ///
     /// This function won't panic ?
     ///
     /// # Examples
-    /// '''
-    /// use Thumbnailer::generic::Crop;
-    /// use Thumbnailer::operations::CropOp
+    /// ```
+    /// use thumbnailer::generic::Crop;
+    /// use thumbnailer::thumbnail::operations::Operation;
+    /// use thumbnailer::thumbnail::operations::CropOp;
     /// use image::DynamicImage;
     ///
-    /// let crop = Crop::Ratio(16, 9);
-    /// let dynamic_image = DynamicImage::new_rgb8(800, 500);
+    /// let crop = Crop::Ratio(16.0, 9.0);
+    /// let mut dynamic_image = DynamicImage::new_rgb8(800, 500);
     ///
     /// let crop_op = CropOp::new(crop);
-    /// crop_op.apply(dynamic_image);
-    /// '''
+    /// crop_op.apply(&mut dynamic_image);
+    /// ```
     fn apply(&self, image: &mut DynamicImage) -> bool {
         let (width, height) = image.dimensions();
 
