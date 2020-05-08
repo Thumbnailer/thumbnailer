@@ -116,14 +116,14 @@ impl Thumbnail {
     }
 
     fn get_dyn_image<'a>(&mut self) -> Result<&mut image::DynamicImage, InternalError> {
-        if let (ImageData::File(file, _)) = &self.image {
+        if let ImageData::File(file, _) = &self.image {
             let reader = Reader::new(BufReader::new(file));
             self.image = ImageData::Image(reader.decode()?);
         }
 
         return match &mut self.image {
             ImageData::Image(image) => Ok(image),
-            ImageData::File(file, _) => Err(InternalError::UnknownError(errors::UnknownError)),
+            ImageData::File(_, _) => Err(InternalError::UnknownError(errors::UnknownError)),
         };
     }
 
