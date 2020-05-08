@@ -9,6 +9,19 @@ pub enum FileError {
     NotFound(FileNotFoundError),
     NotSupported(FileNotSupportedError),
     IoError(io::Error),
+    UnknownError(UnknownError),
+}
+
+impl std::convert::From<InternalError> for FileError {
+    fn from(err: InternalError) -> Self {
+        match err {
+            InternalError::UnknownError(err)  => FileError::UnknownError(err),
+            InternalError::ImageError(err) => match err {
+                ImageError::IoError(err) => FileError::IoError(err),
+                _ => FileError::UnknownError(UnknownError)
+            }
+        }
+    }
 }
 
 pub(crate) enum InternalError {
@@ -23,7 +36,7 @@ impl std::convert::From<image::error::ImageError> for InternalError {
 }
 
 #[derive(Debug, Clone)]
-pub(crate) struct UnknownError;
+pub struct UnknownError;
 impl fmt::Display for UnknownError {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f, "Unknown error")
