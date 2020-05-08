@@ -33,16 +33,16 @@ impl Clone for Box<dyn Operation> {
 #[derive(Copy, Clone)]
 /// Representation of the resizing operation as a struct
 pub struct ResizeOp {
-    /// Contains the Resize enum as option
+    /// Contains the `Resize` enum as option
     size: Resize,
     /// Contains an optional filter for the resize operation
     filter: Option<ResampleFilter>,
 }
 
 impl ResizeOp {
-    /// Returns a new ResizeOp-struct with defined:
-    /// * size as instance of Resize-enum
-    /// * optional filter
+    /// Returns a new `ResizeOp` struct with defined:
+    /// * `size` as instance of `Resize` enum
+    /// * optional `filter`
     pub fn new(size: Resize, filter: Option<ResampleFilter>) -> Self {
         ResizeOp { size, filter }
     }
@@ -51,13 +51,13 @@ impl ResizeOp {
 impl Operation for ResizeOp {
     /// Logic for the resize-operation
     ///
-    /// This function resizes a DynamicImage, depending on the options given by the members of ResizeOp-struct.
-    /// It returns true on success and false in case of an error.
+    /// This function resizes a `DynamicImage`, depending on the options given by the members of `ResizeOp` struct.
+    /// It returns `true` on success and `false` in case of an error.
     ///
     /// # Arguments
     ///
-    /// * `&self` - The ResizeOp-struct
-    /// * `image` - The DynamicImage that should be resized
+    /// * `&self` - The `ResizeOp` struct
+    /// * `image` - The `DynamicImage` that should be resized
     ///
     /// # Panic
     ///
@@ -137,13 +137,13 @@ impl Operation for ResizeOp {
 #[derive(Copy, Clone)]
 /// Representation of the crop-operation as a struct
 pub struct CropOp {
-    /// contains the Crop-enum as option
+    /// contains the `Crop` enum as option
     crop: Crop,
 }
 
 impl CropOp {
-    /// Returns a new CropOp-struct with defined:
-    /// * crop as instance of Crop-enum
+    /// Returns a new `CropOp` struct with defined:
+    /// * `crop' as instance of `Crop` enum
     pub fn new(crop: Crop) -> Self {
         CropOp { crop }
     }
@@ -152,17 +152,17 @@ impl CropOp {
 impl Operation for CropOp {
     /// Logic for the crop-operation
     ///
-    /// This function crops a DynamicImage, based on the type of the Crop-enum
-    /// * with Crop::Box: Exactly crops the image to a rectangle defined by the coordinates of the top-left-corner, a width and a height.
-    /// * with Crop::Ratio: Crops the image to a rectangle given by a width-height-ratio. The rectangle is scaled to the maximum that fits
+    /// This function crops a `DynamicImage`, based on the type of the `Crop` enum
+    /// * with `Crop::Box`: Exactly crops the image to a rectangle defined by the coordinates of the top-left-corner, a width and a height.
+    /// * with `Crop::Ratio`: Crops the image to a rectangle given by a width-height-ratio. The rectangle is scaled to the maximum that fits
     /// inside the image
     ///
-    /// It returns true on success and false in case of an error.
+    /// It returns `true` on success and `false` in case of an error.
     ///
     /// # Arguments
     ///
-    /// * `&self` - The CropOp-struct
-    /// * `image` - The DynamicImage that should be cropped
+    /// * `&self` - The `CropOp` struct
+    /// * `image` - The `DynamicImage` that should be cropped
     ///
     /// # Panic
     ///
@@ -218,8 +218,8 @@ pub struct BlurOp {
 }
 
 impl BlurOp {
-    /// Returns a new BlurOp-struct with defined:
-    /// * sigma: More Information: [Gaussian Blur](https://en.wikipedia.org/wiki/Gaussian_blur)
+    /// Returns a new `BlurOp` struct with defined:
+    /// * `sigma`: More Information: [Gaussian Blur](https://en.wikipedia.org/wiki/Gaussian_blur)
     pub fn new(sigma: f32) -> Self {
         BlurOp { sigma }
     }
@@ -228,14 +228,14 @@ impl BlurOp {
 impl Operation for BlurOp {
     /// Logic for the blur-operation
     ///
-    /// This function blurs a DynamicImage based on a given sigma-value in BlurOp.
+    /// This function blurs a `DynamicImage` based on a given `sigma` in `BlurOp`
     /// Mathematical background: [Gaussian Blur](https://en.wikipedia.org/wiki/Gaussian_blur).
-    /// It returns true on success and false in case of an error.
+    /// It returns `true` on success and `false` in case of an error.
     ///
     /// # Arguments
     ///
-    /// * `&self` - The BlurOp-struct
-    /// * `image` - The DynamicImage that should be blurred
+    /// * `&self` - The `BlurOp` struct
+    /// * `image` - The `DynamicImage` that should be blurred
     ///
     /// # Panic
     ///
@@ -270,8 +270,8 @@ pub struct BrightenOp {
 }
 
 impl BrightenOp {
-    /// Returns a new BrightenOp-struct with defined:
-    /// * value: i32
+    /// Returns a new `BrightenOp` struct with defined:
+    /// * `value: i32`
     pub fn new(value: i32) -> Self {
         BrightenOp { value }
     }
@@ -280,14 +280,14 @@ impl BrightenOp {
 impl Operation for BrightenOp {
     /// Logic for the brighten-operation
     ///
-    /// This function brightens a DynamicImage based on the given value in BrightenOp.
+    /// This function brightens a `DynamicImage` based on the given `value` in `BrightenOp`
     /// Positive values will brighten the image up and negative values will decrease the brightess.
-    /// It returns true on success and false in case of an error.
+    /// It returns `true` on success and `false` in case of an error.
     ///
     /// # Arguments
     ///
-    /// * `&self` - The BrightenOp-struct
-    /// * `image` - The DynamicImage that should be brightened
+    /// * `&self` - The `BrightenOp` struct
+    /// * `image` - The `DynamicImage` that should be brightened
     ///
     /// # Panic
     ///
@@ -343,8 +343,8 @@ pub struct ContrastOp {
 }
 
 impl ContrastOp {
-    /// Returns a new ContrastOp-struct with defined:
-    /// * value: f32
+    /// Returns a new `ContrastOp` struct with defined:
+    /// * `value: f32`
     pub fn new(value: f32) -> Self {
         ContrastOp { value }
     }
@@ -353,14 +353,14 @@ impl ContrastOp {
 impl Operation for ContrastOp {
     /// Logic for the contrast-operation
     ///
-    /// This function adjusts the contrast in a Dynamic-Image
+    /// This function adjusts the contrast in a `Dynamic-Image`.
     /// Positive values will increase the contrast and negative values will decrease the contrast.
-    /// It returns true on success and false in case of an error.
+    /// It returns `true` on success and `false` in case of an error.
     ///
     /// # Arguments
     ///
-    /// * `&self` - The ContrastOp-struct
-    /// * `image` - The DynamicImage where the contrast should be adjusted
+    /// * `&self` - The `ContrastOp` struct
+    /// * `image` - The `DynamicImage` where the contrast should be adjusted
     ///
     /// # Panic
     ///
@@ -387,17 +387,51 @@ impl Operation for ContrastOp {
 }
 
 #[derive(Copy, Clone)]
+/// Representation of the flip-operation as struct
 pub struct FlipOp {
+    /// contains the `Orientation` enum
     orientation: Orientation,
 }
 
 impl FlipOp {
+    /// Returns a new `FlipOp` struct with defined:
+    /// * `orientation` as instance of `Orientation` enum
     pub fn new(orientation: Orientation) -> Self {
         FlipOp { orientation }
     }
 }
 
 impl Operation for FlipOp {
+    /// Logic for the flip-operation
+    ///
+    /// This function flips a `DynamicImage` based on the option selected in the `Orientation`-enum:
+    /// * with `Orientation::Vertical`: Flips the image vertically.
+    /// * with `Orientation::Horizontal`: Flips the image horizontally.
+    ///
+    /// It returns `true` on success and `false` in case of an error.
+    ///
+    /// # Arguments
+    ///
+    /// * `&self` - The `FlipOp` struct
+    /// * `image` - The `DynamicImage` that should be flipped
+    ///
+    /// # Panic
+    ///
+    /// This function won't panic ?
+    ///
+    /// # Examples
+    /// ```
+    /// use thumbnailer::generic::Orientation;
+    /// use thumbnailer::thumbnail::operations::Operation;
+    /// use thumbnailer::thumbnail::operations::FlipOp;
+    /// use image::DynamicImage;
+    ///
+    /// let orientation = Orientation::Vertical;
+    /// let mut dynamic_image = DynamicImage::new_rgb8(800, 500);
+    ///
+    /// let flip_op = FlipOp::new(orientation);
+    /// flip_op.apply(&mut dynamic_image);
+    /// ```
     fn apply(&self, image: &mut DynamicImage) -> bool
     where
         Self: Sized,
