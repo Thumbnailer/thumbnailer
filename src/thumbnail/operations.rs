@@ -225,33 +225,33 @@ impl BlurOp {
     }
 }
 
-/// Logic for the blur-operation
-///
-/// This function blurs a DynamicImage based on a given sigma-value in BlurOp.
-/// Mathematical background: [Gaussian Blur](https://en.wikipedia.org/wiki/Gaussian_blur).
-/// It returns true on success and false in case of an error.
-///
-/// # Arguments
-///
-/// * `&self` - The BlurOp-struct
-/// * `image` - The DynamicImage that should be blurred
-///
-/// # Panic
-///
-/// This function won't panic ?
-///
-/// # Examples
-/// ```
-/// use thumbnailer::thumbnail::operations::Operation;
-/// use thumbnailer::thumbnail::operations::BlurOp;
-/// use image::DynamicImage;
-///
-/// let mut dynamic_image = DynamicImage::new_rgb8(800, 500);
-///
-/// let blur_op = BlurOp::new(3.5);
-/// blur_op.apply(&mut dynamic_image);
-/// ```
 impl Operation for BlurOp {
+    /// Logic for the blur-operation
+    ///
+    /// This function blurs a DynamicImage based on a given sigma-value in BlurOp.
+    /// Mathematical background: [Gaussian Blur](https://en.wikipedia.org/wiki/Gaussian_blur).
+    /// It returns true on success and false in case of an error.
+    ///
+    /// # Arguments
+    ///
+    /// * `&self` - The BlurOp-struct
+    /// * `image` - The DynamicImage that should be blurred
+    ///
+    /// # Panic
+    ///
+    /// This function won't panic ?
+    ///
+    /// # Examples
+    /// ```
+    /// use thumbnailer::thumbnail::operations::Operation;
+    /// use thumbnailer::thumbnail::operations::BlurOp;
+    /// use image::DynamicImage;
+    ///
+    /// let mut dynamic_image = DynamicImage::new_rgb8(800, 500);
+    ///
+    /// let blur_op = BlurOp::new(3.5);
+    /// blur_op.apply(&mut dynamic_image);
+    /// ```
     fn apply(&self, image: &mut DynamicImage) -> bool
     where
         Self: Sized,
@@ -277,33 +277,33 @@ impl BrightenOp {
     }
 }
 
-/// Logic for the brighten-operation
-///
-/// This function brightens a DynamicImage based on the given value in BrightenOp.
-/// Positive values will brighten the image up and negative values will decrease the brightess.
-/// It returns true on success and false in case of an error.
-///
-/// # Arguments
-///
-/// * `&self` - The BrightenOp-struct
-/// * `image` - The DynamicImage that should be brightened
-///
-/// # Panic
-///
-/// This function won't panic ?
-///
-/// # Examples
-/// ```
-/// use thumbnailer::thumbnail::operations::Operation;
-/// use thumbnailer::thumbnail::operations::BrightenOp;
-/// use image::DynamicImage;
-///
-/// let mut dynamic_image = DynamicImage::new_rgb8(800, 500);
-///
-/// let brighten_op = BrightenOp::new(5);
-/// brighten_op.apply(&mut dynamic_image);
-/// ```
 impl Operation for BrightenOp {
+    /// Logic for the brighten-operation
+    ///
+    /// This function brightens a DynamicImage based on the given value in BrightenOp.
+    /// Positive values will brighten the image up and negative values will decrease the brightess.
+    /// It returns true on success and false in case of an error.
+    ///
+    /// # Arguments
+    ///
+    /// * `&self` - The BrightenOp-struct
+    /// * `image` - The DynamicImage that should be brightened
+    ///
+    /// # Panic
+    ///
+    /// This function won't panic ?
+    ///
+    /// # Examples
+    /// ```
+    /// use thumbnailer::thumbnail::operations::Operation;
+    /// use thumbnailer::thumbnail::operations::BrightenOp;
+    /// use image::DynamicImage;
+    ///
+    /// let mut dynamic_image = DynamicImage::new_rgb8(800, 500);
+    ///
+    /// let brighten_op = BrightenOp::new(5);
+    /// brighten_op.apply(&mut dynamic_image);
+    /// ```
     fn apply(&self, image: &mut DynamicImage) -> bool
     where
         Self: Sized,
@@ -335,17 +335,48 @@ impl Operation for HuerotateOp {
 }
 
 #[derive(Copy, Clone)]
+/// Representation of the contrast-operation as a struct.
 pub struct ContrastOp {
+    /// Value of how much the contrast should be adjusted.
+    /// Positive values will increase and negative values will decrease the contrast.
     value: f32,
 }
 
 impl ContrastOp {
+    /// Returns a new ContrastOp-struct with defined:
+    /// * value: f32
     pub fn new(value: f32) -> Self {
         ContrastOp { value }
     }
 }
 
 impl Operation for ContrastOp {
+    /// Logic for the contrast-operation
+    ///
+    /// This function adjusts the contrast in a Dynamic-Image
+    /// Positive values will increase the contrast and negative values will decrease the contrast.
+    /// It returns true on success and false in case of an error.
+    ///
+    /// # Arguments
+    ///
+    /// * `&self` - The ContrastOp-struct
+    /// * `image` - The DynamicImage where the contrast should be adjusted
+    ///
+    /// # Panic
+    ///
+    /// This function won't panic ?
+    ///
+    /// # Examples
+    /// ```
+    /// use thumbnailer::thumbnail::operations::Operation;
+    /// use thumbnailer::thumbnail::operations::ContrastOp;
+    /// use image::DynamicImage;
+    ///
+    /// let mut dynamic_image = DynamicImage::new_rgb8(800, 500);
+    ///
+    /// let contrast_op = ContrastOp::new(5.0);
+    /// contrast_op.apply(&mut dynamic_image);
+    /// ```
     fn apply(&self, image: &mut DynamicImage) -> bool
     where
         Self: Sized,
