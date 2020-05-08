@@ -5,21 +5,21 @@ use crate::StaticThumbnail;
 pub enum Resize {
     /// Option: scale to a given height, keep aspect ratio.
     /// ### Arguments:
-    /// * height: u32
+    /// * height: `u32`
     Height(u32),
     /// Option: scale to a given width, keep aspect ratio.
     /// ### Arguments:
-    /// * width: u32
+    /// * width: `u32`
     Width(u32),
     /// Option: scale the image so that it fits inside the box given by width and height, keep aspect ratio.
     /// ### Arguments:
-    /// * width: u32
-    /// * height: u32
+    /// * width: `u32`
+    /// * height: `u32`
     BoundingBox(u32, u32),
     /// Option: scale the image to the given width and height exactly, aspect ratio may be changed.
     /// ### Arguments:
-    /// * width: u32
-    /// * height: u32
+    /// * width: `u32`
+    /// * height: `u32`
     ExactBox(u32, u32),
 }
 
@@ -28,23 +28,23 @@ pub enum Resize {
 pub enum BoxPosition {
     /// Coordinates of the top-left-corner in the background image of the overlayed object.
     /// ### Arguments:
-    /// * position_x: u32
-    /// * position_y: u32
+    /// * position_x: `u32`
+    /// * position_y: `u32`
     TopLeft(u32, u32),
     /// Coordinates of the top-right-corner in the background image of the overlayed object.
     /// ### Arguments:
-    /// * position_x: u32
-    /// * position_y: u32
+    /// * position_x: `u32`
+    /// * position_y: `u32`
     TopRight(u32, u32),
     /// Coordinates of the bottom-left-corner in the background image of the overlayed object.
     /// ### Arguments:
-    /// * position_x: u32
-    /// * position_y: u32
+    /// * position_x: `u32`
+    /// * position_y: `u32`
     BottomLeft(u32, u32),
     /// Coordinates of the bottom-right-corner in the background image of the overlayed object.
     /// ### Arguments:
-    /// * position_x: u32
-    /// * position_y: u32
+    /// * position_x: `u32`
+    /// * position_y: `u32`
     BottomRight(u32, u32),
 }
 
@@ -53,16 +53,16 @@ pub enum BoxPosition {
 pub enum Crop {
     /// Options for exactly cropping the image to a rectangle given by the coordinates of the top-left-corner and width and height.
     /// ### Arguments:
-    /// * position_x: u32
-    /// * position_y: u32
-    /// * width: u32
-    /// * height: u32
+    /// * position_x: `u32`
+    /// * position_y: `u32`
+    /// * width: `u32`
+    /// * height: `u32`
     Box(u32, u32, u32, u32),
     /// Option for cropping the image to a rectangle given by a ratio of width and height.
     /// The rectangle is scaled to the maximum that fits inside the origin image.
     /// ### Arguments:
-    /// * ratio_width: u32
-    /// * ratio_height: u32
+    /// * ratio_width: `u32`
+    /// * ratio_height: `u32`
     Ratio(f32, f32),
 }
 
