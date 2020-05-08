@@ -146,10 +146,7 @@ impl Thumbnail {
     }
 
     fn assert_dynamic_image_loaded(&mut self) -> bool {
-        match self.get_dyn_image() {
-            Ok(_) => true,
-            Err(_) => false,
-        }
+        self.get_dyn_image().is_ok()
     }
 }
 

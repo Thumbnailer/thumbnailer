@@ -89,7 +89,6 @@ impl Error for FileNotSupportedError {
         None
     }
 }
-
 pub enum CollectionError {
     FileError(FileError),
     GlobError(globwalk::GlobError),
