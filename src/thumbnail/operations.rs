@@ -1,5 +1,4 @@
 use crate::generic::{BoxPosition, Crop, Exif, Orientation, ResampleFilter, Resize};
-use crate::thumbnail::{ImageData, Thumbnail};
 use crate::StaticThumbnail;
 use image::imageops::FilterType;
 use image::{DynamicImage, GenericImageView};
