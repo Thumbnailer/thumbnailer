@@ -1,12 +1,8 @@
-use crate::thumbnail::operations::{
-    BlurOp, BrightenOp, CombineOp, ContrastOp, CropOp, ExifOp, FlipOp, HuerotateOp, InvertOp,
-    ResizeOp, TextOp, UnsharpenOp,
-};
-use crate::thumbnail::ImageData::Image;
+use crate::generic::OperationContainer;
 use crate::{
     errors,
     errors::{FileError, FileNotFoundError, FileNotSupportedError, InternalError},
-    generic::{BoxPosition, Crop, Exif, GenericThumbnail, Orientation, ResampleFilter, Resize},
+    generic::GenericThumbnail,
     thumbnail::operations::Operation,
 };
 use image::{io::Reader, DynamicImage, ImageFormat};
@@ -56,6 +52,12 @@ pub struct Thumbnail {
     width: u32,
     image: ImageData,
     ops: Vec<Box<dyn Operation>>,
+}
+
+impl OperationContainer for Thumbnail {
+    fn add_op(&mut self, op: Box<dyn Operation>) {
+        self.ops.push(op);
+    }
 }
 
 impl Thumbnail {
@@ -144,73 +146,7 @@ impl SingleThumbnail for Thumbnail {
     }
 }
 
-impl GenericThumbnail for Thumbnail<'_> {
-    fn resize(&mut self, size: Resize) -> &mut dyn GenericThumbnail {
-        self.ops.push(Box::new(ResizeOp::new(size, None)));
-        self
-    }
-
-    fn resize_filter(&mut self, size: Resize, filter: ResampleFilter) -> &mut dyn GenericThumbnail {
-        self.ops
-            .push(Box::new(ResizeOp::new(size, Option::from(filter))));
-        self
-    }
-
-    fn blur(&mut self, sigma: f32) -> &mut dyn GenericThumbnail {
-        self.ops.push(Box::new(BlurOp::new(sigma)));
-        self
-    }
-
-    fn brighten(&mut self, value: i32) -> &mut dyn GenericThumbnail {
-        self.ops.push(Box::new(BrightenOp::new(value)));
-        self
-    }
-
-    fn huerotate(&mut self, degree: i32) -> &mut dyn GenericThumbnail {
-        self.ops.push(Box::new(HuerotateOp::new(degree)));
-        self
-    }
-
-    fn contrast(&mut self, value: f32) -> &mut dyn GenericThumbnail {
-        self.ops.push(Box::new(ContrastOp::new(value)));
-        self
-    }
-
-    fn unsharpen(&mut self, sigma: f32, threshold: i32) -> &mut dyn GenericThumbnail {
-        self.ops.push(Box::new(UnsharpenOp::new(sigma, threshold)));
-        self
-    }
-
-    fn crop(&mut self, c: Crop) -> &mut dyn GenericThumbnail {
-        self.ops.push(Box::new(CropOp::new(c)));
-        self
-    }
-
-    fn flip(&mut self, orientation: Orientation) -> &mut dyn GenericThumbnail {
-        self.ops.push(Box::new(FlipOp::new(orientation)));
-        self
-    }
-
-    fn invert(&mut self) -> &mut dyn GenericThumbnail {
-        self.ops.push(Box::new(InvertOp::new()));
-        self
-    }
-
-    fn exif(&mut self, metadata: Exif) -> &mut dyn GenericThumbnail {
-        self.ops.push(Box::new(ExifOp::new(metadata)));
-        self
-    }
-
-    fn text(&mut self, text: String, pos: BoxPosition) -> &mut dyn GenericThumbnail {
-        self.ops.push(Box::new(TextOp::new(text, pos)));
-        self
-    }
-
-    fn combine(&mut self, image: StaticThumbnail, pos: BoxPosition) -> &mut dyn GenericThumbnail {
-        self.ops.push(Box::new(CombineOp::new(image, pos)));
-        self
-    }
-
+impl GenericThumbnail for Thumbnail {
     fn apply(&mut self) -> &mut dyn GenericThumbnail {
         self.assert_dynamic_image_loaded();
 
