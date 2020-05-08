@@ -36,9 +36,6 @@ impl StaticThumbnail {
     }
 }
 
-pub trait SingleThumbnail: GenericThumbnail {
-    fn to_static_copy(&mut self) -> Option<StaticThumbnail>;
-}
 //TODO: #[derive(Clone)]
 enum ImageData {
     File(File, ImageFormat),
@@ -103,6 +100,13 @@ impl Thumbnail {
         })
     }
 
+    pub fn to_static_copy(&mut self) -> Option<StaticThumbnail> {
+        match self.get_dyn_image() {
+            Ok(i) => Some(StaticThumbnail { image: i.clone() }),
+            Err(_) => None,
+        }
+    }
+
     pub fn can_load(path: &Path) -> bool {
         if !path.is_file() {
             return false;
@@ -133,15 +137,6 @@ impl Thumbnail {
         match self.get_dyn_image() {
             Ok(_) => true,
             Err(_) => false,
-        }
-    }
-}
-
-impl SingleThumbnail for Thumbnail {
-    fn to_static_copy(&mut self) -> Option<StaticThumbnail> {
-        match self.get_dyn_image() {
-            Ok(i) => Some(StaticThumbnail { image: i.clone() }),
-            Err(_) => None,
         }
     }
 }

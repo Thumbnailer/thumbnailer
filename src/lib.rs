@@ -8,7 +8,6 @@ mod tests {
 
 pub use crate::generic::GenericThumbnail;
 pub use crate::generic::{BoxPosition, Crop, Exif, Orientation, ResampleFilter, Resize};
-pub use crate::thumbnail::SingleThumbnail;
 pub use crate::thumbnail::StaticThumbnail;
 pub use crate::thumbnail::Thumbnail;
 
