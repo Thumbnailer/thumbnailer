@@ -36,13 +36,11 @@ impl StaticThumbnail {
     }
 }
 
-//TODO: #[derive(Clone)]
 enum ImageData {
     File(File, ImageFormat),
     Image(DynamicImage),
 }
 
-//TODO: #[derive(Clone)]
 pub struct Thumbnail {
     path: PathBuf,
     height: u32,
@@ -105,6 +103,20 @@ impl Thumbnail {
             Ok(i) => Some(StaticThumbnail { image: i.clone() }),
             Err(_) => None,
         }
+    }
+    pub fn try_clone_and_load(&mut self) -> Result<Thumbnail, FileError> {
+        let path = self.path.clone();
+        let height = self.height;
+        let width = self.width;
+        let ops = self.ops.clone();
+        let image_data = self.get_dyn_image()?;
+        Ok(Thumbnail {
+            path,
+            height,
+            width,
+            image: ImageData::Image(image_data.clone()),
+            ops,
+        })
     }
 
     pub fn can_load(path: &Path) -> bool {
