@@ -19,9 +19,8 @@ impl ThumbnailCollectionBuilder {
     }
 
     pub fn add_path(&mut self, path: &str) -> Result<&mut Self, CollectionError> {
-        if let t = Thumbnail::load(Path::new(path).to_path_buf())? {
-            self.collection.images.push(t);
-        }
+        let t = Thumbnail::load(Path::new(path).to_path_buf())?;
+        self.collection.images.push(t);
         Ok(self)
     }
 
