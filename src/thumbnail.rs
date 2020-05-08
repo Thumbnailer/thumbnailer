@@ -10,6 +10,7 @@ use crate::{
     thumbnail::operations::Operation,
 };
 use image::{io::Reader, DynamicImage, ImageFormat};
+use std::path::PathBuf;
 use std::{fs::File, io::BufReader, path::Path};
 
 pub mod operations;
@@ -49,21 +50,21 @@ enum ImageData {
 }
 
 //TODO: #[derive(Clone)]
-pub struct Thumbnail<'a> {
-    path: &'a Path,
+pub struct Thumbnail {
+    path: PathBuf,
     height: u32,
     width: u32,
     image: ImageData,
     ops: Vec<Box<dyn Operation>>,
 }
 
-impl Thumbnail<'_> {
-    pub fn load(path: &Path) -> Result<Thumbnail, FileError> {
+impl Thumbnail {
+    pub fn load(path: PathBuf) -> Result<Thumbnail, FileError> {
         if !path.is_file() {
             return Err(FileError::NotFound(FileNotFoundError { path }));
         }
 
-        let file = match File::open(path) {
+        let file = match File::open(path.clone()) {
             Ok(f) => f,
             Err(e) => return Err(FileError::IoError(e)),
         };
@@ -92,7 +93,7 @@ impl Thumbnail<'_> {
         };
 
         Ok(Thumbnail {
-            path,
+            path: path.to_path_buf(),
             image: ImageData::File(reader.into_inner().into_inner(), format),
             height: 0,
             width: 0,
@@ -134,7 +135,7 @@ impl Thumbnail<'_> {
     }
 }
 
-impl SingleThumbnail for Thumbnail<'_> {
+impl SingleThumbnail for Thumbnail {
     fn to_static_copy(&mut self) -> Option<StaticThumbnail> {
         match self.get_dyn_image() {
             Ok(i) => Some(StaticThumbnail { image: i.clone() }),
