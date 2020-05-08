@@ -210,16 +210,47 @@ impl Operation for CropOp {
 }
 
 #[derive(Copy, Clone)]
+/// Representation of the blur-operation as a struct
 pub struct BlurOp {
+    /// Value that specifies how much the image should be blurred
     sigma: f32,
 }
 
 impl BlurOp {
+    /// Returns a new BlurOp-struct with defined:
+    /// * crop as instance of Crop-enum
+    /// 
+    /// More Information: [Gaussian Blur](https://en.wikipedia.org/wiki/Gaussian_blur)
     pub fn new(sigma: f32) -> Self {
         BlurOp { sigma }
     }
 }
 
+/// Logic for the blur-operation
+///
+/// This function blurs a DynamicImage based on a given sigma-value in BlurOp
+/// It returns true on success and false in case of an error.
+///
+/// # Arguments
+///
+/// * `&self` - The BlurOp-struct
+/// * `image` - The DynamicImage that should be blurred
+///
+/// # Panic
+///
+/// This function won't panic ?
+///
+/// # Examples
+/// ```
+/// use thumbnailer::thumbnail::operations::Operation;
+/// use thumbnailer::thumbnail::operations::BlurOp;
+/// use image::DynamicImage;
+///
+/// let mut dynamic_image = DynamicImage::new_rgb8(800, 500);
+///
+/// let blur_op = BlurOp::new(3.5);
+/// blur_op.apply(&mut dynamic_image);
+/// ```
 impl Operation for BlurOp {
     fn apply(&self, image: &mut DynamicImage) -> bool
     where
