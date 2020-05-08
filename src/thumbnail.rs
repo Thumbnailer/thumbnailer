@@ -13,6 +13,7 @@ pub mod operations;
 
 #[derive(Clone)]
 pub struct StaticThumbnail {
+    src_path: PathBuf,
     image: DynamicImage,
 }
 
@@ -33,6 +34,9 @@ impl StaticThumbnail {
             Some(rgb_image) => rgb_image.height(),
             None => 0,
         }
+    }
+    pub fn get_src_path(&self) -> PathBuf {
+        self.src_path.clone()
     }
 }
 
@@ -99,8 +103,12 @@ impl Thumbnail {
     }
 
     pub fn to_static_copy(&mut self) -> Option<StaticThumbnail> {
+        let src_path = self.path.clone();
         match self.get_dyn_image() {
-            Ok(i) => Some(StaticThumbnail { image: i.clone() }),
+            Ok(i) => Some(StaticThumbnail {
+                src_path,
+                image: i.clone(),
+            }),
             Err(_) => None,
         }
     }
