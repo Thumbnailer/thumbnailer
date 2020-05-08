@@ -446,14 +446,42 @@ impl Operation for FlipOp {
 }
 
 #[derive(Copy, Clone)]
+/// Representation of the invert-operation as struct
 pub struct InvertOp;
 
 impl InvertOp {
+    /// Returns a new `InvertOp` struct
     pub fn new() -> Self {
         InvertOp {}
     }
 }
 
+/// Logic for the invert-operation
+///
+/// This function inverts the colors in a `Dynamic-Image`.
+/// More information: [Negative colors](https://en.wikipedia.org/wiki/Negative_(photography))
+/// It returns `true` on success and `false` in case of an error.
+///
+/// # Arguments
+///
+/// * `&self` - The `InvertOp` struct
+/// * `image` - The `DynamicImage` that should be inverted
+///
+/// # Panic
+///
+/// This function won't panic ?
+///
+/// # Examples
+/// ```
+/// use thumbnailer::thumbnail::operations::Operation;
+/// use thumbnailer::thumbnail::operations::InvertOp;
+/// use image::DynamicImage;
+///
+/// let mut dynamic_image = DynamicImage::new_rgb8(800, 500);
+///
+/// let invert_op = InvertOp::new();
+/// invert_op.apply(&mut dynamic_image);
+/// ```
 impl Operation for InvertOp {
     fn apply(&self, image: &mut DynamicImage) -> bool
     where
@@ -485,18 +513,56 @@ impl Operation for ExifOp {
 }
 
 #[derive(Clone)]
+/// Representation of the operation of drawing texts as a struct
 pub struct TextOp {
+    /// The text that should be drawn
     text: String,
+    /// Specifies the position of the Text, represented by `BoxPosition` enum
     pos: BoxPosition,
 }
 
 impl TextOp {
+    /// Returns a new `TextOp` struct with defined:
+    /// * `text` as the text that should be drawn
+    /// * `pos` as the position of the text represented by `BoxPosition` enum
     pub fn new(text: String, pos: BoxPosition) -> Self {
         TextOp { text, pos }
     }
 }
 
 impl Operation for TextOp {
+    /// Logic for the operation of drawing texts on an image
+    ///
+    /// This function draws a `String` in a `DynamicImage` at the position defined in the `BoxPosition`-enum:
+    /// * with `BoxPosition::TopLeft`: The top-left-corner of the text ist placed at the defined coordinates
+    /// * with `BoxPosition::TopRight`: The top-right-corner of the text ist placed at the defined coordinates
+    /// * with `BoxPosition::BottomLeft`: The bottom-left-corner of the text ist placed at the defined coordinates
+    /// * with `BoxPosition::BottomRight`: The bottom-right-corner of the text ist placed at the defined coordinates
+    ///
+    /// It returns `true` on success and `false` in case of an error.
+    ///
+    /// # Arguments
+    ///
+    /// * `&self` - The `TextOp` struct
+    /// * `image` - The `DynamicImage` where the text should be drawn on
+    ///
+    /// # Panic
+    ///
+    /// This function won't panic ?
+    ///
+    /// # Examples
+    /// ```
+    /// use thumbnailer::generic::BoxPosition;
+    /// use thumbnailer::thumbnail::operations::Operation;
+    /// use thumbnailer::thumbnail::operations::TextOp;
+    /// use image::DynamicImage;
+    ///
+    /// let position = BoxPosition::TopLeft(23, 40);
+    /// let mut dynamic_image = DynamicImage::new_rgb8(800, 500);
+    ///
+    /// let text_op = TextOp::new("Hello world!".to_string(), position);
+    /// text_op.apply(&mut dynamic_image);
+    /// ```
     fn apply(&self, image: &mut DynamicImage) -> bool
     where
         Self: Sized,
