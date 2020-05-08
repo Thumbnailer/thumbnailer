@@ -31,18 +31,51 @@ impl Clone for Box<dyn Operation> {
 }
 
 #[derive(Copy, Clone)]
+/// Representation of the resizing operation as a struct
 pub(crate) struct ResizeOp {
+    /// Contains the Resize enum as option
     size: Resize,
+    /// Contains an optional filter for the resize operation
     filter: Option<ResampleFilter>,
 }
 
 impl ResizeOp {
+    /// Returns a new ResizeOp-struct with defined:
+    /// * size as instance of Resize-enum
+    /// * optional filter
     pub fn new(size: Resize, filter: Option<ResampleFilter>) -> Self {
         ResizeOp { size, filter }
     }
 }
 
 impl Operation for ResizeOp {
+    /// Logic for the resize-operation
+    ///
+    /// This function resizes a DynamicImage, depending on the options given by the members of ResizeOp-struct.
+    /// It returns true on success and false in case of an error.
+    ///
+    /// # Arguments
+    ///
+    /// * '&self' - The ResizeOp-struct
+    /// * 'image' - The DynamicImage that should be resized
+    ///
+    /// # Panic
+    ///
+    /// This function won't panic ?
+    ///
+    /// # Examples
+    /// '''
+    /// use Thumbnailer::generic::{Resize, ResampleFilter};
+    /// use Thumbnailer::operations::ResizeOp
+    /// use image::DynamicImage;
+    ///
+    /// let size = Resize::BoundingBox(400, 300);
+    /// let filter = ResampleFilter::Gaussian;
+    /// let dynamic_image = DynamicImage::new_rgb8(800, 500);
+    ///
+    /// let resize_op = ResizeOp::new(size, filter);
+    /// resize_op.apply(dynamic_image);
+    /// '''
     fn apply(&self, image: &mut DynamicImage) -> bool {
         let aspect_ratio = match image.as_rgb8() {
             Some(rgb_image) => rgb_image.width() as f32 / rgb_image.height() as f32,
@@ -101,17 +134,51 @@ impl Operation for ResizeOp {
     }
 }
 #[derive(Copy, Clone)]
+/// Representation of the crop-operation as a struct
 pub(crate) struct CropOp {
+    /// contains the Crop-enum as option
     crop: Crop,
 }
 
 impl CropOp {
+    /// Returns a new CropOp-struct with defined:
+    /// * crop as instance of Crop-enum
     pub fn new(crop: Crop) -> Self {
         CropOp { crop }
     }
 }
 
 impl Operation for CropOp {
+    /// Logic for the crop-operation
+    ///
+    /// This function crops a DynamicImage, based on the type of the Crop-enum
+    /// * with Crop::Box: Exactly crops the image to a rectangle defined by the coordinates of the top-left-corner, a width and a height.
+    /// * with Crop::Ratio: Crops the image to a rectangle given by a width-height-ratio. The rectangle is scaled to the maximum that fits
+    /// inside the image
+    ///
+    /// It returns true on success and false in case of an error.
+    ///
+    /// # Arguments
+    ///
+    /// * '&self' - The CropOp-struct
+    /// * 'image' - The DynamicImage that should be cropped
+    ///
+    /// # Panic
+    ///
+    /// This function won't panic ?
+    ///
+    /// # Examples
+    /// '''
+    /// use Thumbnailer::generic::Crop;
+    /// use Thumbnailer::operations::CropOp
+    /// use image::DynamicImage;
+    ///
+    /// let crop = Crop::Ratio(16, 9);
+    /// let dynamic_image = DynamicImage::new_rgb8(800, 500);
+    ///
+    /// let crop_op = CropOp::new(crop);
+    /// crop_op.apply(dynamic_image);
+    /// '''
     fn apply(&self, image: &mut DynamicImage) -> bool {
         let (width, height) = image.dimensions();
 
