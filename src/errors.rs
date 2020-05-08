@@ -1,3 +1,4 @@
+use crate::thumbnail::operations::Operation;
 use image::ImageError;
 use std::error::Error;
 use std::fmt::Formatter;
@@ -103,5 +104,33 @@ impl std::convert::From<FileError> for CollectionError {
 impl std::convert::From<globwalk::GlobError> for CollectionError {
     fn from(error: globwalk::GlobError) -> Self {
         CollectionError::GlobError(error)
+    }
+}
+
+pub enum ApplyError {
+    OperationError(OperationError),
+    LoadingImageError,
+}
+
+#[derive(Debug, Clone)]
+pub struct OperationError {
+    op: Box<dyn Operation>,
+}
+
+impl OperationError {
+    pub fn new(op: Box<dyn Operation>) -> Self {
+        OperationError { op }
+    }
+}
+
+impl fmt::Display for OperationError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "Applying operation failed")
+    }
+}
+
+impl Error for OperationError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        None
     }
 }

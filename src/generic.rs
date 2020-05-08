@@ -1,3 +1,4 @@
+use crate::errors::{ApplyError, OperationError};
 use crate::thumbnail::operations::{
     BlurOp, BrightenOp, CombineOp, ContrastOp, CropOp, ExifOp, FlipOp, HuerotateOp, InvertOp,
     Operation, ResizeOp, TextOp, UnsharpenOp,
@@ -107,7 +108,7 @@ pub trait OperationContainer {
 }
 
 pub trait GenericThumbnail: GenericThumbnailOperations {
-    fn apply(&mut self) -> &mut dyn GenericThumbnail;
+    fn apply(&mut self) -> Result<&mut dyn GenericThumbnail, ApplyError>;
 }
 
 pub trait GenericThumbnailOperations {

@@ -1,3 +1,4 @@
+use crate::errors::{ApplyError, OperationError};
 use crate::generic::OperationContainer;
 use crate::{
     errors,
@@ -148,20 +149,45 @@ impl Thumbnail {
     fn assert_dynamic_image_loaded(&mut self) -> bool {
         self.get_dyn_image().is_ok()
     }
+
+    pub(crate) fn apply_ops_list(
+        &mut self,
+        ops: &Vec<Box<dyn Operation>>,
+    ) -> Result<(), ApplyError> {
+        if !self.assert_dynamic_image_loaded() {
+            return Err(ApplyError::LoadingImageError);
+        }
+
+        if let ImageData::Image(image) = &mut self.image {
+            for operation in ops {
+                if !operation.apply(image) {
+                    return Err(ApplyError::OperationError(OperationError::new(
+                        operation.clone(),
+                    )));
+                }
+            }
+        }
+
+        Ok(())
+    }
 }
 
 impl GenericThumbnail for Thumbnail {
-    fn apply(&mut self) -> &mut dyn GenericThumbnail {
+    fn apply(&mut self) -> Result<&mut dyn GenericThumbnail, ApplyError> {
         self.assert_dynamic_image_loaded();
 
         if let ImageData::Image(image) = &mut self.image {
             for operation in &self.ops {
-                operation.apply(image);
+                if !operation.apply(image) {
+                    return Err(ApplyError::OperationError(OperationError::new(
+                        operation.clone(),
+                    )));
+                }
             }
         }
 
         self.ops.clear();
 
-        self
+        Ok(self)
     }
 }
