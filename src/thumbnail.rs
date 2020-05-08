@@ -47,8 +47,6 @@ enum ImageData {
 
 pub struct Thumbnail {
     path: PathBuf,
-    height: u32,
-    width: u32,
     image: ImageData,
     ops: Vec<Box<dyn Operation>>,
 }
@@ -96,8 +94,6 @@ impl Thumbnail {
         Ok(Thumbnail {
             path: path.to_path_buf(),
             image: ImageData::File(reader.into_inner().into_inner(), format),
-            height: 0,
-            width: 0,
             ops: vec![],
         })
     }
@@ -114,14 +110,10 @@ impl Thumbnail {
     }
     pub fn try_clone_and_load(&mut self) -> Result<Thumbnail, FileError> {
         let path = self.path.clone();
-        let height = self.height;
-        let width = self.width;
         let ops = self.ops.clone();
         let image_data = self.get_dyn_image()?;
         Ok(Thumbnail {
             path,
-            height,
-            width,
             image: ImageData::Image(image_data.clone()),
             ops,
         })
