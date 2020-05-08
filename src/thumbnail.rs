@@ -12,7 +12,7 @@ use crate::{
 use image::{io::Reader, DynamicImage, ImageFormat};
 use std::{fs::File, io::BufReader, path::Path};
 
-mod operations;
+pub mod operations;
 
 #[derive(Clone)]
 pub struct StaticThumbnail {

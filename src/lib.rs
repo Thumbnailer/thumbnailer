@@ -12,6 +12,6 @@ pub use crate::thumbnail::SingleThumbnail;
 pub use crate::thumbnail::StaticThumbnail;
 pub use crate::thumbnail::Thumbnail;
 
-mod errors;
-mod generic;
-mod thumbnail;
+pub mod errors;
+pub mod generic;
+pub mod thumbnail;

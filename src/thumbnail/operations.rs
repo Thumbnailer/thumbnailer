@@ -32,7 +32,7 @@ impl Clone for Box<dyn Operation> {
 
 #[derive(Copy, Clone)]
 /// Representation of the resizing operation as a struct
-pub(crate) struct ResizeOp {
+pub struct ResizeOp {
     /// Contains the Resize enum as option
     size: Resize,
     /// Contains an optional filter for the resize operation
@@ -136,7 +136,7 @@ impl Operation for ResizeOp {
 }
 #[derive(Copy, Clone)]
 /// Representation of the crop-operation as a struct
-pub(crate) struct CropOp {
+pub struct CropOp {
     /// contains the Crop-enum as option
     crop: Crop,
 }
@@ -210,7 +210,7 @@ impl Operation for CropOp {
 }
 
 #[derive(Copy, Clone)]
-pub(crate) struct BlurOp {
+pub struct BlurOp {
     sigma: f32,
 }
 
@@ -231,7 +231,7 @@ impl Operation for BlurOp {
 }
 
 #[derive(Copy, Clone)]
-pub(crate) struct BrightenOp {
+pub struct BrightenOp {
     value: i32,
 }
 
@@ -252,7 +252,7 @@ impl Operation for BrightenOp {
 }
 
 #[derive(Copy, Clone)]
-pub(crate) struct HuerotateOp {
+pub struct HuerotateOp {
     degree: i32,
 }
 
@@ -273,7 +273,7 @@ impl Operation for HuerotateOp {
 }
 
 #[derive(Copy, Clone)]
-pub(crate) struct ContrastOp {
+pub struct ContrastOp {
     value: f32,
 }
 
@@ -294,7 +294,7 @@ impl Operation for ContrastOp {
 }
 
 #[derive(Copy, Clone)]
-pub(crate) struct FlipOp {
+pub struct FlipOp {
     orientation: Orientation,
 }
 
@@ -319,7 +319,7 @@ impl Operation for FlipOp {
 }
 
 #[derive(Copy, Clone)]
-pub(crate) struct InvertOp;
+pub struct InvertOp;
 
 impl InvertOp {
     pub fn new() -> Self {
@@ -338,7 +338,7 @@ impl Operation for InvertOp {
 }
 
 #[derive(Clone)]
-pub(crate) struct ExifOp {
+pub struct ExifOp {
     metadata: Exif,
 }
 
@@ -358,7 +358,7 @@ impl Operation for ExifOp {
 }
 
 #[derive(Clone)]
-pub(crate) struct TextOp {
+pub struct TextOp {
     text: String,
     pos: BoxPosition,
 }
@@ -429,7 +429,7 @@ impl Operation for TextOp {
 }
 
 #[derive(Clone)]
-pub(crate) struct CombineOp {
+pub struct CombineOp {
     image: StaticThumbnail,
     pos: BoxPosition,
 }
@@ -493,7 +493,7 @@ impl Operation for CombineOp {
 }
 
 #[derive(Copy, Clone)]
-pub(crate) struct UnsharpenOp {
+pub struct UnsharpenOp {
     sigma: f32,
     threshold: i32,
 }
