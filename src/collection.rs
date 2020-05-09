@@ -1,8 +1,9 @@
 use crate::errors::{ApplyError, CollectionError};
 use crate::generic::OperationContainer;
+use crate::thumbnail::data::ThumbnailData;
 use crate::thumbnail::operations::Operation;
 use crate::{GenericThumbnail, Target, Thumbnail};
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 pub struct ThumbnailCollectionBuilder {
     collection: ThumbnailCollection,
@@ -19,7 +20,7 @@ impl ThumbnailCollectionBuilder {
     }
 
     pub fn add_path(&mut self, path: &str) -> Result<&mut Self, CollectionError> {
-        let t = Thumbnail::load(Path::new(path).to_path_buf())?;
+        let t = ThumbnailData::load(Path::new(path).to_path_buf())?;
         self.collection.images.push(t);
         Ok(self)
     }
@@ -29,7 +30,7 @@ impl ThumbnailCollectionBuilder {
         let mut new_thumbs = vec![];
         for file in files {
             if let Ok(file) = file {
-                new_thumbs.push(Thumbnail::load(Path::new(file.path()).to_path_buf())?);
+                new_thumbs.push(ThumbnailData::load(Path::new(file.path()).to_path_buf())?);
             }
         }
         self.collection.images.append(new_thumbs.as_mut());
@@ -37,7 +38,7 @@ impl ThumbnailCollectionBuilder {
     }
 
     pub fn add_thumb(&mut self, thumb: Thumbnail) -> Result<&mut Self, CollectionError> {
-        self.collection.images.push(thumb);
+        self.collection.images.push(thumb.into_data());
         Ok(self)
     }
 
@@ -47,7 +48,7 @@ impl ThumbnailCollectionBuilder {
 }
 
 pub struct ThumbnailCollection {
-    images: Vec<Thumbnail>,
+    images: Vec<ThumbnailData>,
     ops: Vec<Box<dyn Operation>>,
 }
 
