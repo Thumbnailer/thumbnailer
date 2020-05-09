@@ -41,7 +41,7 @@ impl StaticThumbnail {
     }
 }
 
-enum ImageData {
+pub(crate) enum ImageData {
     File(File, ImageFormat),
     Image(DynamicImage),
 }
@@ -99,6 +99,10 @@ impl Thumbnail {
         })
     }
 
+    pub fn get_path(&self) -> PathBuf {
+        self.path.clone()
+    }
+
     pub fn to_static_copy(&mut self) -> Option<StaticThumbnail> {
         let src_path = self.path.clone();
         match self.get_dyn_image() {
@@ -134,7 +138,7 @@ impl Thumbnail {
         }
     }
 
-    fn get_dyn_image<'a>(&mut self) -> Result<&mut image::DynamicImage, InternalError> {
+    pub(crate) fn get_dyn_image<'a>(&mut self) -> Result<&mut image::DynamicImage, InternalError> {
         if let ImageData::File(file, _) = &self.image {
             let reader = Reader::new(BufReader::new(file));
             self.image = ImageData::Image(reader.decode()?);
@@ -153,7 +157,7 @@ impl Thumbnail {
     pub(crate) fn apply_ops_list(
         &mut self,
         ops: &Vec<Box<dyn Operation>>,
-    ) -> Result<(), ApplyError> {
+    ) -> Result<&mut Self, ApplyError> {
         if !self.assert_dynamic_image_loaded() {
             return Err(ApplyError::LoadingImageError);
         }
@@ -168,7 +172,7 @@ impl Thumbnail {
             }
         }
 
-        Ok(())
+        Ok(self)
     }
 }
 
