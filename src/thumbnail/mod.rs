@@ -11,8 +11,12 @@ use image::{io::Reader, DynamicImage};
 use std::path::Path;
 use std::path::PathBuf;
 
+pub mod collection;
 pub mod data;
 pub mod operations;
+
+pub use collection::ThumbnailCollection;
+pub use collection::ThumbnailCollectionBuilder;
 
 #[derive(Clone)]
 pub struct StaticThumbnail {
