@@ -6,6 +6,7 @@ use crate::{GenericThumbnail, Target, Thumbnail};
 use rayon::prelude::*;
 use std::path::Path;
 
+#[derive(Debug)]
 pub struct ThumbnailCollectionBuilder {
     collection: ThumbnailCollection,
 }
@@ -48,6 +49,7 @@ impl ThumbnailCollectionBuilder {
     }
 }
 
+#[derive(Debug)]
 pub struct ThumbnailCollection {
     images: Vec<ThumbnailData>,
     ops: Vec<Box<dyn Operation>>,

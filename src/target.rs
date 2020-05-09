@@ -4,6 +4,7 @@ use image::{DynamicImage, ImageFormat};
 use std::ffi::OsStr;
 use std::path::PathBuf;
 
+#[derive(Debug)]
 pub enum TargetMethod {
     Jpeg,
     Png,
@@ -12,16 +13,19 @@ pub enum TargetMethod {
     Gif,
 }
 
+#[derive(Debug)]
 pub struct TargetItem {
     path: PathBuf,
     // flatten: bool,
     method: TargetMethod,
 }
 
+#[derive(Debug)]
 pub struct Target {
     items: Vec<TargetItem>,
 }
 
+#[derive(Debug)]
 pub struct TargetBuilder {
     target: Target,
 }
