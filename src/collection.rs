@@ -3,6 +3,7 @@ use crate::generic::OperationContainer;
 use crate::thumbnail::data::ThumbnailData;
 use crate::thumbnail::operations::Operation;
 use crate::{GenericThumbnail, Target, Thumbnail};
+use rayon::prelude::*;
 use std::path::Path;
 
 pub struct ThumbnailCollectionBuilder {
@@ -60,47 +61,50 @@ impl OperationContainer for ThumbnailCollection {
 
 impl GenericThumbnail for ThumbnailCollection {
     fn apply(&mut self) -> Result<&mut dyn GenericThumbnail, ApplyError> {
-        for thumb in &mut self.images {
-            thumb.apply_ops_list(&self.ops)?;
-        }
-
+        let ops = self.ops.clone();
         self.ops.clear();
+
+        self.images.par_iter_mut().for_each(|data| {
+            data.apply_ops_list(&ops);
+        });
 
         Ok(self)
     }
 
     fn apply_store(mut self, target: &Target) -> bool {
-        for (n, mut thumb) in self.images.drain(0..).enumerate() {
-            if thumb.apply_ops_list(&self.ops).is_ok() {
-                if target.store(&mut thumb, Some(n as u32)).is_err() {
-                    return false;
-                }
-            } else {
-                return false;
-            }
-        }
-
-        true
+        self.apply_store_keep(target).is_ok()
     }
 
     fn apply_store_keep(
         &mut self,
         target: &Target,
     ) -> Result<&mut dyn GenericThumbnail, ApplyError> {
-        for (n, thumb) in &mut self.images.iter_mut().enumerate() {
-            thumb.apply_ops_list(&self.ops)?;
-            target.store(thumb, Some(n as u32));
-        }
+        let ops = self.ops.clone();
         self.ops.clear();
+
+        self.images
+            .par_iter_mut()
+            .enumerate()
+            .for_each(|(n, data)| {
+                data.apply_ops_list(&ops);
+                target.store(data, Some(n as u32));
+            });
 
         Ok(self)
     }
 
-    fn store(self, target: &Target) -> bool {
-        unimplemented!()
+    fn store(mut self, target: &Target) -> bool {
+        self.store_keep(target).is_ok()
     }
 
     fn store_keep(&mut self, target: &Target) -> Result<&mut dyn GenericThumbnail, ApplyError> {
-        unimplemented!()
+        self.images
+            .par_iter_mut()
+            .enumerate()
+            .for_each(|(n, data)| {
+                target.store(data, Some(n as u32));
+            });
+
+        Ok(self)
     }
 }

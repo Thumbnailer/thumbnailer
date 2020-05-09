@@ -8,7 +8,7 @@ use rusttype::{Font, Scale};
 use std::fmt;
 use std::fmt::{Debug, Formatter};
 
-pub trait Operation: OperationClone + Debug {
+pub trait Operation: OperationClone + Debug + Send + Sync {
     fn apply(&self, image: &mut DynamicImage) -> bool;
 }
 
