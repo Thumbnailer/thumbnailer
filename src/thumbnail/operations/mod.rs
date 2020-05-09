@@ -570,7 +570,7 @@ impl Operation for TextOp {
     {
         let scale = Scale { x: 12.0, y: 12.0 };
 
-        let font_data: &[u8] = include_bytes!("../../resources/fonts/Roboto-Regular.ttf");
+        let font_data: &[u8] = include_bytes!("../../../resources/fonts/Roboto-Regular.ttf");
         let font: Font<'static> = match Font::from_bytes(font_data) {
             Ok(font_bytes) => font_bytes,
             Err(_) => return false,
