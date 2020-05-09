@@ -25,20 +25,13 @@ pub struct Target {
     items: Vec<TargetItem>,
 }
 
-#[derive(Debug)]
-pub struct TargetBuilder {
-    target: Target,
-}
-
-impl TargetBuilder {
+impl Target {
     pub fn new() -> Self {
-        TargetBuilder {
-            target: Target { items: vec![] },
-        }
+        Target { items: vec![] }
     }
 
-    pub fn add_target(&mut self, method: TargetMethod, dst: PathBuf) -> &mut Self {
-        self.target.items.push(TargetItem {
+    pub fn add_target(mut self, method: TargetMethod, dst: PathBuf) -> Self {
+        self.items.push(TargetItem {
             path: dst,
             // flatten: false,
             method,
@@ -57,12 +50,6 @@ impl TargetBuilder {
     //     self
     // }
 
-    pub fn finalize(self) -> Target {
-        self.target
-    }
-}
-
-impl Target {
     pub fn store(
         &self,
         thumb: &mut ThumbnailData,
