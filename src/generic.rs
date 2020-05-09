@@ -1,9 +1,9 @@
-use crate::errors::{ApplyError, OperationError};
+use crate::errors::ApplyError;
 use crate::thumbnail::operations::{
     BlurOp, BrightenOp, CombineOp, ContrastOp, CropOp, ExifOp, FlipOp, HuerotateOp, InvertOp,
     Operation, ResizeOp, TextOp, UnsharpenOp,
 };
-use crate::StaticThumbnail;
+use crate::{StaticThumbnail, Target};
 
 #[derive(Debug, Copy, Clone)]
 /// The different options for the resize-operation as an enum
@@ -109,6 +109,14 @@ pub trait OperationContainer {
 
 pub trait GenericThumbnail: GenericThumbnailOperations {
     fn apply(&mut self) -> Result<&mut dyn GenericThumbnail, ApplyError>;
+    fn apply_store(self, target: &Target) -> bool;
+    fn apply_store_keep(
+        &mut self,
+        target: &Target,
+    ) -> Result<&mut dyn GenericThumbnail, ApplyError>;
+
+    fn store(self, target: &Target) -> bool;
+    fn store_keep(&mut self, target: &Target) -> Result<&mut dyn GenericThumbnail, ApplyError>;
 }
 
 pub trait GenericThumbnailOperations {

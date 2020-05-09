@@ -5,6 +5,7 @@ use crate::{
     errors::{FileError, FileNotFoundError, FileNotSupportedError, InternalError},
     generic::GenericThumbnail,
     thumbnail::operations::Operation,
+    Target,
 };
 use image::{io::Reader, DynamicImage, ImageFormat};
 use std::path::PathBuf;
@@ -193,5 +194,36 @@ impl GenericThumbnail for Thumbnail {
         self.ops.clear();
 
         Ok(self)
+    }
+
+    fn apply_store(mut self, target: &Target) -> bool {
+        if self.apply().is_ok() {
+            self.store(target)
+        } else {
+            false
+        }
+    }
+
+    fn apply_store_keep(
+        &mut self,
+        target: &Target,
+    ) -> Result<&mut dyn GenericThumbnail, ApplyError> {
+        self.apply()?;
+        self.store_keep(target)?;
+        Ok(self)
+    }
+
+    fn store(mut self, target: &Target) -> bool {
+        return match target.store(&mut self, None) {
+            Ok(_) => true,
+            Err(_) => false,
+        };
+    }
+
+    fn store_keep(&mut self, target: &Target) -> Result<&mut dyn GenericThumbnail, ApplyError> {
+        match target.store(self, None) {
+            Ok(_) => Ok(self),
+            Err(e) => Err(ApplyError::LoadingImageError),
+        }
     }
 }

@@ -1,8 +1,8 @@
-use crate::errors::{CollectionError, FileError};
+use crate::errors::{ApplyError, CollectionError};
 use crate::generic::OperationContainer;
 use crate::thumbnail::operations::Operation;
 use crate::{GenericThumbnail, Target, Thumbnail};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 pub struct ThumbnailCollectionBuilder {
     collection: ThumbnailCollection,
@@ -57,3 +57,49 @@ impl OperationContainer for ThumbnailCollection {
     }
 }
 
+impl GenericThumbnail for ThumbnailCollection {
+    fn apply(&mut self) -> Result<&mut dyn GenericThumbnail, ApplyError> {
+        for thumb in &mut self.images {
+            thumb.apply_ops_list(&self.ops)?;
+        }
+
+        self.ops.clear();
+
+        Ok(self)
+    }
+
+    fn apply_store(mut self, target: &Target) -> bool {
+        for (n, mut thumb) in self.images.drain(0..).enumerate() {
+            if thumb.apply_ops_list(&self.ops).is_ok() {
+                if target.store(&mut thumb, Some(n as u32)).is_err() {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+
+        true
+    }
+
+    fn apply_store_keep(
+        &mut self,
+        target: &Target,
+    ) -> Result<&mut dyn GenericThumbnail, ApplyError> {
+        for (n, thumb) in &mut self.images.iter_mut().enumerate() {
+            thumb.apply_ops_list(&self.ops)?;
+            target.store(thumb, Some(n as u32));
+        }
+        self.ops.clear();
+
+        Ok(self)
+    }
+
+    fn store(self, target: &Target) -> bool {
+        unimplemented!()
+    }
+
+    fn store_keep(&mut self, target: &Target) -> Result<&mut dyn GenericThumbnail, ApplyError> {
+        unimplemented!()
+    }
+}
