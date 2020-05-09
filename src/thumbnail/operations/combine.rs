@@ -115,7 +115,7 @@ impl fmt::Debug for CombineOp {
         write!(
             f,
             "CombineOp: StaticThumbnail {} at pos {:?}",
-            self.image.src_path.to_str().unwrap_or_default(),
+            self.image.get_src_path().to_str().unwrap_or_default(),
             self.pos
         )
     }
