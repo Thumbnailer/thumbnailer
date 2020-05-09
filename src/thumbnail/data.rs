@@ -76,8 +76,9 @@ impl ThumbnailData {
     }
 
     pub(crate) fn get_dyn_image<'a>(&mut self) -> Result<&mut image::DynamicImage, InternalError> {
-        if let ImageData::File(file, _) = &self.image {
-            let reader = Reader::new(BufReader::new(file));
+        if let ImageData::File(file, format) = &self.image {
+            let mut reader = Reader::new(BufReader::new(file));
+            reader.set_format(*format);
             self.image = ImageData::Image(reader.decode()?);
         }
 
