@@ -5,6 +5,8 @@ use crate::errors::{
 use crate::thumbnail::operations::Operation;
 use image::io::Reader;
 use image::{DynamicImage, ImageFormat};
+use std::fmt;
+use std::fmt::Formatter;
 use std::fs::File;
 use std::io::BufReader;
 use std::path::PathBuf;
@@ -14,6 +16,16 @@ pub(crate) enum ImageData {
     Image(DynamicImage),
 }
 
+impl fmt::Debug for ImageData {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        match self {
+            ImageData::File(file, format) => write!(f, "ImageData::File( {:?}, {:?}", file, format),
+            ImageData::Image(_) => write!(f, "ImageData::Image(DynamicImage)"),
+        }
+    }
+}
+
+#[derive(Debug)]
 pub struct ThumbnailData {
     path: PathBuf,
     image: ImageData,
