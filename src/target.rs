@@ -14,7 +14,7 @@ pub enum TargetMethod {
 
 pub struct TargetItem {
     path: PathBuf,
-    flatten: bool,
+    // flatten: bool,
     method: TargetMethod,
 }
 
@@ -36,22 +36,22 @@ impl TargetBuilder {
     pub fn add_target(&mut self, method: TargetMethod, dst: PathBuf) -> &mut Self {
         self.target.items.push(TargetItem {
             path: dst,
-            flatten: false,
+            // flatten: false,
             method,
         });
 
         self
     }
 
-    pub fn add_target_flatten(&mut self, method: TargetMethod, dst: PathBuf) -> &mut Self {
-        self.target.items.push(TargetItem {
-            path: dst,
-            flatten: true,
-            method,
-        });
-
-        self
-    }
+    // pub fn add_target_flatten(&mut self, method: TargetMethod, dst: PathBuf) -> &mut Self {
+    //     self.target.items.push(TargetItem {
+    //         path: dst,
+    //         flatten: true,
+    //         method,
+    //     });
+    //
+    //     self
+    // }
 
     pub fn finalize(self) -> Target {
         self.target
