@@ -6,14 +6,13 @@ mod tests {
     }
 }
 
-pub use crate::collection::ThumbnailCollection;
 pub use crate::generic::GenericThumbnail;
 pub use crate::generic::{BoxPosition, Crop, Exif, Orientation, ResampleFilter, Resize};
 pub use crate::target::{Target, TargetBuilder};
 pub use crate::thumbnail::StaticThumbnail;
 pub use crate::thumbnail::Thumbnail;
+pub use crate::thumbnail::ThumbnailCollection;
 
-pub mod collection;
 pub mod errors;
 pub mod generic;
 pub mod target;
