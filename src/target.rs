@@ -1,5 +1,5 @@
 use crate::errors::FileError;
-use crate::Thumbnail;
+use crate::thumbnail::data::ThumbnailData;
 use image::{DynamicImage, ImageFormat};
 use std::ffi::OsStr;
 use std::path::PathBuf;
@@ -59,7 +59,11 @@ impl TargetBuilder {
 }
 
 impl Target {
-    pub fn store(&self, thumb: &mut Thumbnail, count: Option<u32>) -> Result<PathBuf, FileError> {
+    pub fn store(
+        &self,
+        thumb: &mut ThumbnailData,
+        count: Option<u32>,
+    ) -> Result<PathBuf, FileError> {
         let orig_path = thumb.get_path();
         let filename = match orig_path.file_stem() {
             None => OsStr::new("NAME_MISSING"),
