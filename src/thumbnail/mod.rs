@@ -20,6 +20,7 @@ pub use collection::ThumbnailCollection;
 pub use collection::ThumbnailCollectionBuilder;
 pub use static_thumb::StaticThumbnail;
 
+#[derive(Debug)]
 pub struct Thumbnail {
     data: ThumbnailData,
     ops: Vec<Box<dyn Operation>>,
