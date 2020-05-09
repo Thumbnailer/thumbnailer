@@ -7,45 +7,18 @@ use crate::{
     thumbnail::operations::Operation,
     Target,
 };
-use image::{io::Reader, DynamicImage};
+use image::io::Reader;
 use std::path::Path;
 use std::path::PathBuf;
 
 pub mod collection;
 pub mod data;
 pub mod operations;
+pub mod static_thumb;
 
 pub use collection::ThumbnailCollection;
 pub use collection::ThumbnailCollectionBuilder;
-
-#[derive(Clone)]
-pub struct StaticThumbnail {
-    src_path: PathBuf,
-    image: DynamicImage,
-}
-
-impl StaticThumbnail {
-    pub fn as_dyn(&self) -> &DynamicImage {
-        &self.image
-    }
-
-    pub fn get_width(&self) -> u32 {
-        match self.as_dyn().as_rgb8() {
-            Some(rgb_image) => rgb_image.width(),
-            None => 0,
-        }
-    }
-
-    pub fn get_height(&self) -> u32 {
-        match self.as_dyn().as_rgb8() {
-            Some(rgb_image) => rgb_image.height(),
-            None => 0,
-        }
-    }
-    pub fn get_src_path(&self) -> PathBuf {
-        self.src_path.clone()
-    }
-}
+pub use static_thumb::StaticThumbnail;
 
 pub struct Thumbnail {
     data: ThumbnailData,
@@ -77,10 +50,7 @@ impl Thumbnail {
     pub fn clone_static_copy(&mut self) -> Option<StaticThumbnail> {
         let src_path = self.data.get_path();
         match self.get_dyn_image() {
-            Ok(i) => Some(StaticThumbnail {
-                src_path,
-                image: i.clone(),
-            }),
+            Ok(i) => Some(StaticThumbnail::new(src_path, i.clone())),
             Err(_) => None,
         }
     }
