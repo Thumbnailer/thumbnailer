@@ -12,6 +12,7 @@ pub mod flip;
 pub mod huerotate;
 pub mod invert;
 pub mod resize;
+pub mod rotate;
 pub mod text;
 pub mod unsharpen;
 
@@ -26,6 +27,7 @@ pub use flip::FlipOp;
 pub use huerotate::HuerotateOp;
 pub use invert::InvertOp;
 pub use resize::ResizeOp;
+pub use rotate::RotateOp;
 pub use text::TextOp;
 pub use unsharpen::UnsharpenOp;
 
