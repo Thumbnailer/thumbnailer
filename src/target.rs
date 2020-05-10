@@ -5,7 +5,7 @@ use std::ffi::OsStr;
 use std::path::PathBuf;
 
 #[derive(Debug)]
-pub enum TargetMethod {
+pub enum TargetFormat {
     Jpeg,
     Png,
     Tiff,
@@ -17,7 +17,7 @@ pub enum TargetMethod {
 pub struct TargetItem {
     path: PathBuf,
     // flatten: bool,
-    method: TargetMethod,
+    method: TargetFormat,
 }
 
 #[derive(Debug)]
@@ -26,11 +26,11 @@ pub struct Target {
 }
 
 impl Target {
-    pub fn new() -> Self {
-        Target { items: vec![] }
+    pub fn new(method: TargetFormat, dst: PathBuf) -> Self {
+        Target { items: vec![] }.add_target(method, dst)
     }
 
-    pub fn add_target(mut self, method: TargetMethod, dst: PathBuf) -> Self {
+    pub fn add_target(mut self, method: TargetFormat, dst: PathBuf) -> Self {
         self.items.push(TargetItem {
             path: dst,
             // flatten: false,
@@ -85,11 +85,11 @@ impl Target {
             let dyn_image = thumb.get_dyn_image()?;
 
             let path = match item.method {
-                TargetMethod::Jpeg => store_jpg(dyn_image, path),
-                TargetMethod::Png => store_png(dyn_image, path),
-                TargetMethod::Tiff => store_tiff(dyn_image, path),
-                TargetMethod::Bmp => store_bmp(dyn_image, path),
-                TargetMethod::Gif => store_gif(dyn_image, path),
+                TargetFormat::Jpeg => store_jpg(dyn_image, path),
+                TargetFormat::Png => store_png(dyn_image, path),
+                TargetFormat::Tiff => store_tiff(dyn_image, path),
+                TargetFormat::Bmp => store_bmp(dyn_image, path),
+                TargetFormat::Gif => store_gif(dyn_image, path),
             };
         }
 
