@@ -23,7 +23,7 @@ impl Operation for BrightenOp {
     ///
     /// This function brightens a `DynamicImage` based on the given `value` in `BrightenOp`
     /// Positive values will brighten the image up and negative values will decrease the brightess.
-    /// It returns `true` on success and `false` in case of an error.
+    /// It returns `Ok(())` on success and `Err(OperationError)` in case of an error.
     ///
     /// # Arguments
     ///

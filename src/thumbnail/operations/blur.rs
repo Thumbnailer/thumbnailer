@@ -23,7 +23,7 @@ impl Operation for BlurOp {
     ///
     /// This function blurs a `DynamicImage` based on a given `sigma` in `BlurOp`
     /// Mathematical background: [Gaussian Blur](https://en.wikipedia.org/wiki/Gaussian_blur).
-    /// It returns `true` on success and `false` in case of an error.
+    /// It returns `Ok(())` on success and `Err(OperationError)` in case of an error.
     ///
     /// # Arguments
     ///

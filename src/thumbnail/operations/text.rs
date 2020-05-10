@@ -32,7 +32,7 @@ impl Operation for TextOp {
     /// * with `BoxPosition::BottomLeft`: The bottom-left-corner of the text is placed at the defined coordinates
     /// * with `BoxPosition::BottomRight`: The bottom-right-corner of the text is placed at the defined coordinates
     ///
-    /// It returns `true` on success and `false` in case of an error.
+    /// It returns `Ok(())` on success and `Err(OperationError)` in case of an error.
     ///
     /// # Arguments
     ///

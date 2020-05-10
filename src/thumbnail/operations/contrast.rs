@@ -23,7 +23,7 @@ impl Operation for ContrastOp {
     ///
     /// This function adjusts the contrast in a `Dynamic-Image`.
     /// Positive values will increase the contrast and negative values will decrease the contrast.
-    /// It returns `true` on success and `false` in case of an error.
+    /// It returns `Ok(())` on success and `Err(OperationError)` in case of an error.
     ///
     /// # Arguments
     ///
