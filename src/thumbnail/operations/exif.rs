@@ -15,7 +15,7 @@ impl ExifOp {
 }
 
 impl Operation for ExifOp {
-    fn apply(&self, image: &mut DynamicImage) -> Result<(), OperationError>
+    fn apply(&self, _image: &mut DynamicImage) -> Result<(), OperationError>
     where
         Self: Sized,
     {
