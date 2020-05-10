@@ -1,7 +1,7 @@
 use crate::errors::ApplyError;
 use crate::thumbnail::operations::{
     BlurOp, BrightenOp, CombineOp, ContrastOp, CropOp, ExifOp, FlipOp, HuerotateOp, InvertOp,
-    Operation, ResizeOp, TextOp, UnsharpenOp,
+    Operation, ResizeOp, RotateOp, TextOp, UnsharpenOp,
 };
 use crate::{StaticThumbnail, Target};
 
@@ -101,6 +101,17 @@ pub enum ResampleFilter {
     Gaussian,
     /// Lanczos with window 3
     Lanczos3,
+}
+
+#[derive(Debug, Copy, Clone)]
+/// Rotation options as an enum
+pub enum Rotation {
+    /// Option for a 90 degree clockwise rotation
+    Rotate90,
+    /// Option for a 180 degree clockwise rotation
+    Rotate180,
+    /// Option for a 270 degree clockwise rotation
+    Rotate270,
 }
 
 /// A trait for the queueing of operations
@@ -322,6 +333,17 @@ pub trait GenericThumbnailOperations {
     /// * `image` - The image that should be drawn on `self`
     /// * `pos` - The position of `image` represented by the `BoxPosition` enum
     fn combine(&mut self, image: StaticThumbnail, pos: BoxPosition) -> &mut dyn GenericThumbnail;
+
+    /// Representation of the rotate operation
+    ///
+    /// This function adds the rotate operation to the queue of the oject represented by `&mut self`.
+    /// It returns a `GenericThumbnail`.
+    ///
+    /// # Arguments
+    ///
+    /// * `&mut self` - The object on which rotate should be applied
+    /// * `rotation` - Options for the operation represented by the `Rotation` enum
+    fn rotate(&mut self, rotation: Rotation) -> &mut dyn GenericThumbnail;
 }
 
 impl<T> GenericThumbnailOperations for T
@@ -551,6 +573,24 @@ where
     /// This function won't panic
     fn combine(&mut self, image: StaticThumbnail, pos: BoxPosition) -> &mut dyn GenericThumbnail {
         self.add_op(Box::new(CombineOp::new(image, pos)));
+        self
+    }
+
+    /// Representation of the rotate operation
+    ///
+    /// This function adds `RotateOp` to the queue of a `GenericThumbnail` represented by `&mut self`.
+    /// It returns itself after that.
+    ///
+    /// # Arguments
+    ///
+    /// * `&mut self` - The object on which `RotateOp` should be applied
+    /// * `rotation` -  Options for the operation represented by the `Rotation` enum
+    ///
+    /// # Panic
+    ///
+    /// This function won't panic
+    fn rotate(&mut self, rotation: Rotation) -> &mut dyn GenericThumbnail {
+        self.add_op(Box::new(RotateOp::new(rotation)));
         self
     }
 }
