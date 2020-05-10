@@ -6,12 +6,17 @@ use crate::{GenericThumbnail, Target, Thumbnail};
 use rayon::prelude::*;
 use std::path::{Path, PathBuf};
 
+/// The `ThumbnailCollectionBuilder` type. Allows to create a `ThumbnailCollection`
+///
+/// Provides method to construct a `ThumbnailCollection` from various image sources.
 #[derive(Debug)]
 pub struct ThumbnailCollectionBuilder {
+    /// The collection being built
     collection: ThumbnailCollection,
 }
 
 impl ThumbnailCollectionBuilder {
+    /// Creates a new instance of `ThumbnailCollectionBuilder`
     pub fn new() -> ThumbnailCollectionBuilder {
         ThumbnailCollectionBuilder {
             collection: ThumbnailCollection {
@@ -20,13 +25,49 @@ impl ThumbnailCollectionBuilder {
             },
         }
     }
-
+    /// Adds a single image by path to the collection.
+    ///
+    /// This internally calls the `ThumbnailData::load` method, and stores the result.
+    ///
+    /// # Errors
+    /// Can return a `FileError::NotFound` if the file could not be found
+    /// Can return a `FileError::NotSupported` if the file is of an unsupported type
+    /// Can return a `FileError::IoError` if an error occurred while accessing the file
+    ///
+    /// # Examples
+    /// ```
+    /// use thumbnailer::thumbnail::ThumbnailCollectionBuilder;
+    /// let mut builder = ThumbnailCollectionBuilder::new();
+    /// builder.add_path("path/to/file.jpg").is_ok();
+    /// ```
     pub fn add_path(&mut self, path: &str) -> Result<&mut Self, FileError> {
         let t = ThumbnailData::load(Path::new(path).to_path_buf())?;
         self.collection.images.push(t);
         Ok(self)
     }
-
+    /// Adds a multiple images by (unix) glob to the collection.
+    ///
+    /// This uses the (globwalk)[https://docs.rs/globwalk/0.8.0/globwalk/] to parse the glob and find the files.
+    /// See its documentation on how to construct globs.
+    ///
+    /// This internally calls the `ThumbnailData::load` method, and stores the result.
+    ///
+    /// * glob: &str - the glob to match files on the filesystem. See [glob (programming)](https://en.wikipedia.org/wiki/Glob_(programming))
+    ///
+    /// # Attention
+    /// It stops parsing the found files on the first error loading a file
+    ///
+    /// # Errors
+    /// Can return a `FileError::NotFound` if the file could not be found
+    /// Can return a `FileError::NotSupported` if the file is of an unsupported type
+    /// Can return a `FileError::IoError` if an error occurred while accessing the file
+    /// Can return a `FileError::GlobError` if parsing the glob fails
+    /// # Examples
+    /// ```
+    /// use thumbnailer::thumbnail::ThumbnailCollectionBuilder;
+    /// let mut builder = ThumbnailCollectionBuilder::new();
+    /// builder.add_path("resources/tests/*.{png,jpg}").is_ok();
+    /// ```
     pub fn add_glob(&mut self, glob: &str) -> Result<&mut Self, FileError> {
         let files = globwalk::glob(glob)?;
         let mut new_thumbs = vec![];
@@ -39,11 +80,39 @@ impl ThumbnailCollectionBuilder {
         Ok(self)
     }
 
+    /// Adds a single, already existing `Thumbnail` to the collection
+    ///
+    /// * thumb: Thumbnail - The image to add.
+    ///
+    /// # Errors
+    /// Cannot return a type. The Result return type is for consistency.
+    ///
+    /// # Examples
+    /// ```
+    /// use thumbnailer::thumbnail::ThumbnailCollectionBuilder;
+    /// use thumbnailer::Thumbnail;
+    /// use std::path::{PathBuf, Path};
+    /// let mut builder = ThumbnailCollectionBuilder::new();
+    /// let thumb = Thumbnail::load(Path::new("resources/tests/test.jpg").to_path_buf()).unwrap();
+    /// builder.add_thumb(thumb).is_ok();
+    /// ```
     pub fn add_thumb(&mut self, thumb: Thumbnail) -> Result<&mut Self, FileError> {
         self.collection.images.push(thumb.into_data());
         Ok(self)
     }
 
+    /// Consumes the `ThumbnailCollectionBuilder` and returns the constructed `ThumbnailCollection`
+    ///
+    /// A collection can be used analogous to a single `Thumbnail`
+    ///
+    /// # Examples
+    /// ```
+    /// use thumbnailer::thumbnail::ThumbnailCollectionBuilder;
+    /// let mut builder = ThumbnailCollectionBuilder::new();
+    /// builder.add_path("resources/tests/*.{png,jpg}").is_ok();
+    ///
+    /// let mut collection = builder.finalize();
+    /// ```
     pub fn finalize(self) -> ThumbnailCollection {
         self.collection
     }
@@ -55,9 +124,14 @@ impl Default for ThumbnailCollectionBuilder {
     }
 }
 
+/// The `ThumbnailCollection` type.
+///
+/// This type represents a set of images.
 #[derive(Debug)]
 pub struct ThumbnailCollection {
+    /// List of the actual image data
     images: Vec<ThumbnailData>,
+    /// List of operations to apply to all images in the collection
     ops: Vec<Box<dyn Operation>>,
 }
 
