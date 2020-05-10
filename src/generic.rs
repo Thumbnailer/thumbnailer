@@ -166,7 +166,7 @@ pub trait GenericThumbnail: GenericThumbnailOperations {
 
     /// Stores a `GenericImage`
     ///
-    /// Returns `true` on succuess and `false` in case of an error.
+    /// Returns `true` on success and `false` in case of an error.
     ///
     /// # Arguments
     ///
