@@ -50,7 +50,7 @@ impl Target {
     //     self
     // }
 
-    pub fn store(
+    pub(crate) fn store(
         &self,
         thumb: &mut ThumbnailData,
         count: Option<u32>,
