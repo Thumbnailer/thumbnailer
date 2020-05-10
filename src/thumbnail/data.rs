@@ -97,6 +97,16 @@ impl ThumbnailData {
         ThumbnailData { path, image }
     }
 
+    /// This function creates and returns a new `ThumbnailData` from an existing DynamicImage.
+    ///
+    /// # Arguments
+    ///
+    /// * `path_name` - A custom path for the new `ThumbnailData`
+    /// * `dynamic_image` - The `DynamicImage` that should be contained in the `ThumbnailData`
+    ///
+    /// # Panic
+    ///
+    /// This function won't panic.
     pub(crate) fn from_dynamic_image(path_name: &str, dynamic_image: DynamicImage) -> Self {
         let path = PathBuf::from(path_name);
         let image = ImageData::Image(dynamic_image);
