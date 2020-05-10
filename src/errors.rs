@@ -1,5 +1,5 @@
 use crate::thumbnail::operations::Operation;
-use image::ImageError;
+use globwalk::GlobError;
 use std::error::Error;
 use std::fmt::Formatter;
 use std::path::PathBuf;
@@ -7,46 +7,22 @@ use std::{fmt, io};
 
 #[derive(Debug)]
 pub enum FileError {
+    GlobError(io::Error),
     NotFound(FileNotFoundError),
     NotSupported(FileNotSupportedError),
     IoError(io::Error),
-    UnknownError(UnknownError),
+    UnknownError,
 }
 
-impl std::convert::From<InternalError> for FileError {
-    fn from(err: InternalError) -> Self {
-        match err {
-            InternalError::UnknownError(err) => FileError::UnknownError(err),
-            InternalError::ImageError(err) => match err {
-                ImageError::IoError(err) => FileError::IoError(err),
-                _ => FileError::UnknownError(UnknownError),
-            },
-        }
+impl std::convert::From<globwalk::GlobError> for FileError {
+    fn from(err: GlobError) -> Self {
+        FileError::GlobError(io::Error::from(err))
     }
 }
 
-pub(crate) enum InternalError {
-    ImageError(ImageError),
-    UnknownError(UnknownError),
-}
-
-impl std::convert::From<image::error::ImageError> for InternalError {
-    fn from(err: ImageError) -> Self {
-        InternalError::ImageError(err)
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct UnknownError;
-impl fmt::Display for UnknownError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "Unknown error")
-    }
-}
-
-impl Error for UnknownError {
-    fn source(&self) -> Option<&(dyn Error + 'static)> {
-        None
+impl std::convert::From<std::io::Error> for FileError {
+    fn from(err: io::Error) -> Self {
+        FileError::IoError(err)
     }
 }
 
@@ -70,9 +46,19 @@ impl Error for FileNotFoundError {
         None
     }
 }
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct FileNotSupportedError {
-    pub path: PathBuf,
+    path: PathBuf,
+}
+
+impl FileNotSupportedError {
+    pub fn new(path: PathBuf) -> Self {
+        FileNotSupportedError { path }
+    }
+
+    pub fn get_path(&self) -> &PathBuf {
+        &self.path
+    }
 }
 
 impl fmt::Display for FileNotSupportedError {
@@ -90,26 +76,12 @@ impl Error for FileNotSupportedError {
         None
     }
 }
-pub enum CollectionError {
-    FileError(FileError),
-    GlobError(globwalk::GlobError),
-}
-
-impl std::convert::From<FileError> for CollectionError {
-    fn from(error: FileError) -> Self {
-        CollectionError::FileError(error)
-    }
-}
-
-impl std::convert::From<globwalk::GlobError> for CollectionError {
-    fn from(error: globwalk::GlobError) -> Self {
-        CollectionError::GlobError(error)
-    }
-}
 
 pub enum ApplyError {
     OperationError(OperationError),
-    LoadingImageError,
+    StoreError(FileError),
+    CollectionError(CollectionError),
+    LoadingImageError(FileError),
 }
 
 #[derive(Debug, Clone)]
@@ -141,5 +113,37 @@ impl fmt::Display for OperationError {
 impl Error for OperationError {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         None
+    }
+}
+
+pub struct CollectionError {
+    paths: Vec<PathBuf>,
+    store_errors: Vec<FileError>,
+    operation_errors: Vec<OperationError>,
+}
+
+impl CollectionError {
+    pub fn new(
+        paths: Vec<PathBuf>,
+        store_errors: Vec<FileError>,
+        operation_errors: Vec<OperationError>,
+    ) -> Self {
+        CollectionError {
+            paths,
+            store_errors,
+            operation_errors,
+        }
+    }
+
+    pub fn get_paths(&self) -> &Vec<PathBuf> {
+        &self.paths
+    }
+
+    pub fn get_store_errors(&self) -> &Vec<FileError> {
+        &self.store_errors
+    }
+
+    pub fn get_operation_errors(&self) -> &Vec<OperationError> {
+        &self.operation_errors
     }
 }

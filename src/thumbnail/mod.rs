@@ -2,10 +2,7 @@ use crate::errors::ApplyError;
 use crate::generic::OperationContainer;
 use crate::thumbnail::data::ThumbnailData;
 use crate::{
-    errors::{FileError, InternalError},
-    generic::GenericThumbnail,
-    thumbnail::operations::Operation,
-    Target,
+    errors::FileError, generic::GenericThumbnail, thumbnail::operations::Operation, Target,
 };
 use image::io::Reader;
 use image::DynamicImage;
@@ -94,12 +91,8 @@ impl Thumbnail {
         }
     }
 
-    pub(crate) fn get_dyn_image<'a>(&mut self) -> Result<&mut image::DynamicImage, InternalError> {
+    pub(crate) fn get_dyn_image<'a>(&mut self) -> Result<&mut image::DynamicImage, FileError> {
         return self.data.get_dyn_image();
-    }
-
-    fn assert_dynamic_image_loaded(&mut self) -> bool {
-        self.get_dyn_image().is_ok()
     }
 }
 
@@ -112,34 +105,27 @@ impl GenericThumbnail for Thumbnail {
         Ok(self)
     }
 
-    fn apply_store(mut self, target: &Target) -> bool {
-        if self.apply().is_ok() {
-            self.store(target)
-        } else {
-            false
+    fn apply_store(mut self, target: &Target) -> Result<Vec<PathBuf>, ApplyError> {
+        self.apply()?;
+        self.store(target)
+    }
+
+    fn apply_store_keep(&mut self, target: &Target) -> Result<Vec<PathBuf>, ApplyError> {
+        self.apply()?;
+        self.store_keep(target)
+    }
+
+    fn store(self, target: &Target) -> Result<Vec<PathBuf>, ApplyError> {
+        match target.store(&mut self.into_data(), None) {
+            Ok(files) => Ok(files),
+            Err(err) => Err(ApplyError::StoreError(err)),
         }
     }
 
-    fn apply_store_keep(
-        &mut self,
-        target: &Target,
-    ) -> Result<&mut dyn GenericThumbnail, ApplyError> {
-        self.apply()?;
-        self.store_keep(target)?;
-        Ok(self)
-    }
-
-    fn store(self, target: &Target) -> bool {
-        return match target.store(&mut self.into_data(), None) {
-            Ok(_) => true,
-            Err(_) => false,
-        };
-    }
-
-    fn store_keep(&mut self, target: &Target) -> Result<&mut dyn GenericThumbnail, ApplyError> {
+    fn store_keep(&mut self, target: &Target) -> Result<Vec<PathBuf>, ApplyError> {
         match target.store(&mut self.data, None) {
-            Ok(_) => Ok(self),
-            Err(e) => Err(ApplyError::LoadingImageError),
+            Ok(files) => Ok(files),
+            Err(err) => Err(ApplyError::StoreError(err)),
         }
     }
 }
