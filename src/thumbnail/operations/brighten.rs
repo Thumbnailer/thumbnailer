@@ -43,7 +43,9 @@ impl Operation for BrightenOp {
     /// let mut dynamic_image = DynamicImage::new_rgb8(800, 500);
     ///
     /// let brighten_op = BrightenOp::new(5);
-    /// brighten_op.apply(&mut dynamic_image);
+    /// let res = brighten_op.apply(&mut dynamic_image);
+    ///
+    /// assert!(res.is_ok());
     /// ```
     fn apply(&self, image: &mut DynamicImage) -> Result<(), OperationError>
     where

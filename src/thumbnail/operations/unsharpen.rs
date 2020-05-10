@@ -47,7 +47,9 @@ impl Operation for UnsharpenOp {
     /// let mut dynamic_image = DynamicImage::new_rgb8(800, 500);
     ///
     /// let unsharpen_op = UnsharpenOp::new(3.5, 5);
-    /// unsharpen_op.apply(&mut dynamic_image);
+    /// let res = unsharpen_op.apply(&mut dynamic_image);
+    ///
+    /// assert!(res.is_ok());
     /// ```
     fn apply(&self, image: &mut DynamicImage) -> Result<(), OperationError>
     where

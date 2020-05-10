@@ -48,7 +48,9 @@ impl Operation for CropOp {
     /// let mut dynamic_image = DynamicImage::new_rgb8(800, 500);
     ///
     /// let crop_op = CropOp::new(crop);
-    /// crop_op.apply(&mut dynamic_image);
+    /// let res = crop_op.apply(&mut dynamic_image);
+    ///
+    /// assert!(res.is_ok());
     /// ```
     fn apply(&self, image: &mut DynamicImage) -> Result<(), OperationError> {
         let (width, height) = image.dimensions();

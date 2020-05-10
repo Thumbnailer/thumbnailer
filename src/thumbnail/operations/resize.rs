@@ -49,7 +49,9 @@ impl Operation for ResizeOp {
     /// let mut dynamic_image = DynamicImage::new_rgb8(800, 500);
     ///
     /// let resize_op = ResizeOp::new(size, Some(filter));
-    /// resize_op.apply(&mut dynamic_image);
+    /// let res = resize_op.apply(&mut dynamic_image);
+    ///
+    /// assert!(res.is_ok());
     /// ```
     fn apply(&self, image: &mut DynamicImage) -> Result<(), OperationError> {
         let aspect_ratio = match image.as_rgb8() {

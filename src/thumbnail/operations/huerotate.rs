@@ -41,7 +41,9 @@ impl Operation for HuerotateOp {
     /// let mut dynamic_image = DynamicImage::new_rgb8(800, 500);
     ///
     /// let huerotate_op = HuerotateOp::new(90);
-    /// huerotate_op.apply(&mut dynamic_image);
+    /// let res = huerotate_op.apply(&mut dynamic_image);
+    ///
+    /// assert!(res.is_ok());
     /// ```
     fn apply(&self, image: &mut DynamicImage) -> Result<(), OperationError>
     where
