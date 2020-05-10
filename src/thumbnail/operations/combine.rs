@@ -46,19 +46,24 @@ impl Operation for CombineOp {
     /// # Examples
     /// ```
     /// use thumbnailer::generic::BoxPosition;
+    /// use thumbnailer::thumbnail::Thumbnail;
     /// use thumbnailer::thumbnail::StaticThumbnail;
     /// use thumbnailer::thumbnail::operations::Operation;
     /// use thumbnailer::thumbnail::operations::CombineOp;
     /// use image::DynamicImage;
     ///
     /// let position = BoxPosition::TopLeft(23, 40);
-    /// let mut dynamic_image = DynamicImage::new_rgb8(800, 500);/*
-    /// let mut static_image = StaticThumbnail{
-    ///     image: DynamicImage::new_rgb8(100, 100),
+    /// let mut dynamic_image = DynamicImage::new_rgb8(800, 500);
+    ///
+    /// let dynamic_image_2 = DynamicImage::new_rgb8(100, 100);
+    /// let mut thumbnail = Thumbnail::from_dynamic_image("test.jpg", dynamic_image_2);
+    /// let mut static_thumbnail = match thumbnail.clone_static_copy() {
+    ///     Some(static_tn) => static_tn,
+    ///     None => panic!("Error!"),
     /// };
     ///
-    /// let combine_op = CombineOp::new(static_image, position);
-    /// combine_op.apply(&mut dynamic_image);*/
+    /// let combine_op = CombineOp::new(static_thumbnail, position);
+    /// combine_op.apply(&mut dynamic_image);
     /// ```
     fn apply(&self, image: &mut DynamicImage) -> Result<(), OperationError>
     where

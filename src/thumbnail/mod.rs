@@ -8,6 +8,7 @@ use crate::{
     Target,
 };
 use image::io::Reader;
+use image::DynamicImage;
 use std::path::Path;
 use std::path::PathBuf;
 
@@ -38,6 +39,13 @@ impl Thumbnail {
             data: ThumbnailData::load(path)?,
             ops: vec![],
         })
+    }
+
+    pub fn from_dynamic_image(path_name: &str, dynamic_image: DynamicImage) -> Self {
+        Thumbnail {
+            data: ThumbnailData::from_dynamic_image(path_name, dynamic_image),
+            ops: vec![],
+        }
     }
 
     pub fn into_data(self) -> ThumbnailData {
