@@ -1,3 +1,4 @@
+pub use crate::errors::OperationError;
 use crate::thumbnail::operations::Operation;
 use image::DynamicImage;
 
@@ -48,11 +49,11 @@ impl Operation for UnsharpenOp {
     /// let unsharpen_op = UnsharpenOp::new(3.5, 5);
     /// unsharpen_op.apply(&mut dynamic_image);
     /// ```
-    fn apply(&self, image: &mut DynamicImage) -> bool
+    fn apply(&self, image: &mut DynamicImage) -> Result<(), OperationError>
     where
         Self: Sized,
     {
         *image = image.unsharpen(self.sigma, self.threshold);
-        true
+        Ok(())
     }
 }

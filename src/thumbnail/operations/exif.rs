@@ -1,3 +1,4 @@
+pub use crate::errors::OperationError;
 use crate::thumbnail::operations::Operation;
 use crate::Exif;
 use image::DynamicImage;
@@ -14,7 +15,7 @@ impl ExifOp {
 }
 
 impl Operation for ExifOp {
-    fn apply(&self, image: &mut DynamicImage) -> bool
+    fn apply(&self, image: &mut DynamicImage) -> Result<(), OperationError>
     where
         Self: Sized,
     {

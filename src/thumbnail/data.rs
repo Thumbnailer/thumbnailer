@@ -1,6 +1,6 @@
 use crate::errors;
 use crate::errors::{
-    ApplyError, FileError, FileNotFoundError, FileNotSupportedError, InternalError, OperationError,
+    ApplyError, FileError, FileNotFoundError, FileNotSupportedError, InternalError,
 };
 use crate::thumbnail::operations::Operation;
 use image::io::Reader;
@@ -166,10 +166,9 @@ impl ThumbnailData {
 
         if let Ok(image) = &mut self.get_dyn_image() {
             for operation in ops {
-                if !operation.apply(image) {
-                    return Err(ApplyError::OperationError(OperationError::new(
-                        operation.clone(),
-                    )));
+                match operation.apply(image) {
+                    Ok(_) => (),
+                    Err(error) => return Err(ApplyError::OperationError(error)),
                 }
             }
         }

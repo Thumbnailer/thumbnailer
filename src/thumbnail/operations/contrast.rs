@@ -1,3 +1,4 @@
+pub use crate::errors::OperationError;
 use crate::thumbnail::operations::Operation;
 use image::DynamicImage;
 
@@ -44,11 +45,11 @@ impl Operation for ContrastOp {
     /// let contrast_op = ContrastOp::new(5.0);
     /// contrast_op.apply(&mut dynamic_image);
     /// ```
-    fn apply(&self, image: &mut DynamicImage) -> bool
+    fn apply(&self, image: &mut DynamicImage) -> Result<(), OperationError>
     where
         Self: Sized,
     {
         *image = image.adjust_contrast(self.value);
-        true
+        Ok(())
     }
 }
