@@ -1,3 +1,4 @@
+pub use crate::errors::OperationError;
 use crate::thumbnail::operations::Operation;
 use image::DynamicImage;
 
@@ -39,11 +40,11 @@ impl InvertOp {
 /// invert_op.apply(&mut dynamic_image);
 /// ```
 impl Operation for InvertOp {
-    fn apply(&self, image: &mut DynamicImage) -> bool
+    fn apply(&self, image: &mut DynamicImage) -> Result<(), OperationError>
     where
         Self: Sized,
     {
         image.invert();
-        true
+        Ok(())
     }
 }

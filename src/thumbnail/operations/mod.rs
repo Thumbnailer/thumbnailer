@@ -15,6 +15,7 @@ pub mod resize;
 pub mod text;
 pub mod unsharpen;
 
+pub use crate::errors::OperationError;
 pub use blur::BlurOp;
 pub use brighten::BrightenOp;
 pub use combine::CombineOp;
@@ -33,7 +34,7 @@ pub use unsharpen::UnsharpenOp;
 /// This trait allows the dynamic implementation of the actual methods which apply modifications to the image.
 /// Passing the image to the apply function should perform the desired modifications to it.
 pub trait Operation: OperationClone + Debug + Send + Sync {
-    fn apply(&self, image: &mut DynamicImage) -> bool;
+    fn apply(&self, image: &mut DynamicImage) -> Result<(), OperationError>;
 }
 
 pub trait OperationClone {

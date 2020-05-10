@@ -1,3 +1,4 @@
+pub use crate::errors::OperationError;
 use crate::thumbnail::operations::Operation;
 use crate::Orientation;
 use image::DynamicImage;
@@ -48,7 +49,7 @@ impl Operation for FlipOp {
     /// let flip_op = FlipOp::new(orientation);
     /// flip_op.apply(&mut dynamic_image);
     /// ```
-    fn apply(&self, image: &mut DynamicImage) -> bool
+    fn apply(&self, image: &mut DynamicImage) -> Result<(), OperationError>
     where
         Self: Sized,
     {
@@ -56,7 +57,6 @@ impl Operation for FlipOp {
             Orientation::Vertical => *image = image.flipv(),
             Orientation::Horizontal => *image = image.fliph(),
         }
-
-        true
+        Ok(())
     }
 }

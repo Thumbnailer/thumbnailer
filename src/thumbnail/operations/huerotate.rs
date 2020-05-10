@@ -1,3 +1,4 @@
+pub use crate::errors::OperationError;
 use crate::thumbnail::operations::Operation;
 use image::DynamicImage;
 
@@ -13,11 +14,11 @@ impl HuerotateOp {
 }
 
 impl Operation for HuerotateOp {
-    fn apply(&self, image: &mut DynamicImage) -> bool
+    fn apply(&self, image: &mut DynamicImage) -> Result<(), OperationError>
     where
         Self: Sized,
     {
         *image = image.huerotate(self.degree);
-        true
+        Ok(())
     }
 }

@@ -1,3 +1,4 @@
+pub use crate::errors::{OperationError, OperationErrorInfo};
 use crate::thumbnail::operations::Operation;
 use crate::{ResampleFilter, Resize};
 use image::imageops::FilterType;
@@ -50,10 +51,15 @@ impl Operation for ResizeOp {
     /// let resize_op = ResizeOp::new(size, Some(filter));
     /// resize_op.apply(&mut dynamic_image);
     /// ```
-    fn apply(&self, image: &mut DynamicImage) -> bool {
+    fn apply(&self, image: &mut DynamicImage) -> Result<(), OperationError> {
         let aspect_ratio = match image.as_rgb8() {
             Some(rgb_image) => rgb_image.width() as f32 / rgb_image.height() as f32,
-            _ => return false,
+            _ => {
+                return Err(OperationError::new(
+                    Box::new(self.clone()),
+                    OperationErrorInfo::RgbImageConversionFailure,
+                ))
+            }
         };
 
         let filter_type = match self.filter {
@@ -104,6 +110,6 @@ impl Operation for ResizeOp {
             }
         };
 
-        true
+        Ok(())
     }
 }

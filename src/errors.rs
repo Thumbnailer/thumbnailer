@@ -113,13 +113,22 @@ pub enum ApplyError {
 }
 
 #[derive(Debug, Clone)]
+pub enum OperationErrorInfo {
+    CoordinatesOutOfRange,
+    RgbaImageConversionFailure,
+    RgbImageConversionFailure,
+    FontLoadError,
+}
+
+#[derive(Debug, Clone)]
 pub struct OperationError {
     op: Box<dyn Operation>,
+    info: OperationErrorInfo,
 }
 
 impl OperationError {
-    pub fn new(op: Box<dyn Operation>) -> Self {
-        OperationError { op }
+    pub fn new(op: Box<dyn Operation>, info: OperationErrorInfo) -> Self {
+        OperationError { op: op, info: info }
     }
 }
 

@@ -1,3 +1,4 @@
+pub use crate::errors::{OperationError, OperationErrorInfo};
 use crate::thumbnail::operations::Operation;
 use crate::BoxPosition;
 use image::{DynamicImage, Pixel};
@@ -55,7 +56,7 @@ impl Operation for TextOp {
     /// let text_op = TextOp::new("Hello world!".to_string(), position);
     /// text_op.apply(&mut dynamic_image);
     /// ```
-    fn apply(&self, image: &mut DynamicImage) -> bool
+    fn apply(&self, image: &mut DynamicImage) -> Result<(), OperationError>
     where
         Self: Sized,
     {
@@ -64,7 +65,12 @@ impl Operation for TextOp {
         let font_data: &[u8] = include_bytes!("../../../resources/fonts/Roboto-Regular.ttf");
         let font: Font<'static> = match Font::from_bytes(font_data) {
             Ok(font_bytes) => font_bytes,
-            Err(_) => return false,
+            Err(_) => {
+                return Err(OperationError::new(
+                    Box::new(self.clone()),
+                    OperationErrorInfo::FontLoadError,
+                ))
+            }
         };
 
         let mut string_width = 0.0;
@@ -80,21 +86,30 @@ impl Operation for TextOp {
                 if x >= string_width as u32 {
                     (x - string_width as u32, y)
                 } else {
-                    return false;
+                    return Err(OperationError::new(
+                        Box::new(self.clone()),
+                        OperationErrorInfo::CoordinatesOutOfRange,
+                    ));
                 }
             }
             BoxPosition::BottomLeft(x, y) => {
                 if y >= string_height as u32 {
                     (x, y - string_height as u32)
                 } else {
-                    return false;
+                    return Err(OperationError::new(
+                        Box::new(self.clone()),
+                        OperationErrorInfo::CoordinatesOutOfRange,
+                    ));
                 }
             }
             BoxPosition::BottomRight(x, y) => {
                 if x >= string_width as u32 && y >= string_height as u32 {
                     (x - string_width as u32, y - string_height as u32)
                 } else {
-                    return false;
+                    return Err(OperationError::new(
+                        Box::new(self.clone()),
+                        OperationErrorInfo::CoordinatesOutOfRange,
+                    ));
                 }
             }
         };
@@ -109,6 +124,6 @@ impl Operation for TextOp {
             &self.text,
         );
 
-        true
+        Ok(())
     }
 }

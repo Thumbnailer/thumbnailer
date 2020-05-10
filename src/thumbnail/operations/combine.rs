@@ -1,3 +1,4 @@
+pub use crate::errors::{OperationError, OperationErrorInfo};
 use crate::thumbnail::operations::Operation;
 use crate::{BoxPosition, StaticThumbnail};
 use image::DynamicImage;
@@ -59,7 +60,7 @@ impl Operation for CombineOp {
     /// let combine_op = CombineOp::new(static_image, position);
     /// combine_op.apply(&mut dynamic_image);*/
     /// ```
-    fn apply(&self, image: &mut DynamicImage) -> bool
+    fn apply(&self, image: &mut DynamicImage) -> Result<(), OperationError>
     where
         Self: Sized,
     {
@@ -69,28 +70,42 @@ impl Operation for CombineOp {
                 if x >= self.image.get_width() {
                     (x - self.image.get_width(), y)
                 } else {
-                    return false;
+                    return Err(OperationError::new(
+                        Box::new(self.clone()),
+                        OperationErrorInfo::CoordinatesOutOfRange,
+                    ));
                 }
             }
             BoxPosition::BottomLeft(x, y) => {
                 if y >= self.image.get_height() {
                     (x, y - self.image.get_height())
                 } else {
-                    return false;
+                    return Err(OperationError::new(
+                        Box::new(self.clone()),
+                        OperationErrorInfo::CoordinatesOutOfRange,
+                    ));
                 }
             }
             BoxPosition::BottomRight(x, y) => {
                 if x >= self.image.get_width() && y >= self.image.get_height() {
                     (x - self.image.get_width(), y - self.image.get_height())
                 } else {
-                    return false;
+                    return Err(OperationError::new(
+                        Box::new(self.clone()),
+                        OperationErrorInfo::CoordinatesOutOfRange,
+                    ));
                 }
             }
         };
 
         let buffer_background = match image.as_mut_rgba8() {
             Some(rgba_image) => rgba_image,
-            None => return false,
+            None => {
+                return Err(OperationError::new(
+                    Box::new(self.clone()),
+                    OperationErrorInfo::RgbaImageConversionFailure,
+                ))
+            }
         };
 
         match self.image.as_dyn().as_rgba8() {
@@ -103,10 +118,15 @@ impl Operation for CombineOp {
                     }
                 }
             }
-            None => return false,
+            None => {
+                return Err(OperationError::new(
+                    Box::new(self.clone()),
+                    OperationErrorInfo::RgbaImageConversionFailure,
+                ))
+            }
         };
 
-        true
+        Ok(())
     }
 }
 
