@@ -35,7 +35,7 @@ impl Operation for RotateOp {
     ///
     /// # Panic
     ///
-    /// This function won't panic ?
+    /// This function won't panic
     ///
     /// # Examples
     /// ```
@@ -48,7 +48,9 @@ impl Operation for RotateOp {
     /// let mut dynamic_image = DynamicImage::new_rgb8(800, 500);
     ///
     /// let rotate_op = RotateOp::new(rotation);
-    /// rotate_op.apply(&mut dynamic_image);
+    /// let res = rotate_op.apply(&mut dynamic_image);
+    ///
+    /// assert!(res.is_ok());
     /// ```
     fn apply(&self, image: &mut DynamicImage) -> Result<(), OperationError>
     where
