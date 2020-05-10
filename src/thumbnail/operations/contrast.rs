@@ -43,7 +43,9 @@ impl Operation for ContrastOp {
     /// let mut dynamic_image = DynamicImage::new_rgb8(800, 500);
     ///
     /// let contrast_op = ContrastOp::new(5.0);
-    /// contrast_op.apply(&mut dynamic_image);
+    /// let res = contrast_op.apply(&mut dynamic_image);
+    ///
+    /// assert!(res.is_ok());
     /// ```
     fn apply(&self, image: &mut DynamicImage) -> Result<(), OperationError>
     where

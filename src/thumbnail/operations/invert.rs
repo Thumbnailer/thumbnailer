@@ -38,7 +38,9 @@ impl Operation for InvertOp {
     /// let mut dynamic_image = DynamicImage::new_rgb8(800, 500);
     ///
     /// let invert_op = InvertOp::new();
-    /// invert_op.apply(&mut dynamic_image);
+    /// let res = invert_op.apply(&mut dynamic_image);
+    ///
+    /// assert!(res.is_ok());
     /// ```
     fn apply(&self, image: &mut DynamicImage) -> Result<(), OperationError>
     where

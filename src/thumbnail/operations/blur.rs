@@ -43,7 +43,9 @@ impl Operation for BlurOp {
     /// let mut dynamic_image = DynamicImage::new_rgb8(800, 500);
     ///
     /// let blur_op = BlurOp::new(3.5);
-    /// blur_op.apply(&mut dynamic_image);
+    /// let res = blur_op.apply(&mut dynamic_image);
+    ///
+    /// assert!(res.is_ok());
     /// ```
     fn apply(&self, image: &mut DynamicImage) -> Result<(), OperationError>
     where

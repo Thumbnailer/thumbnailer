@@ -54,8 +54,8 @@ impl Operation for CombineOp {
     ///
     /// let position = BoxPosition::TopLeft(23, 40);
     /// let mut dynamic_image = DynamicImage::new_rgb8(800, 500);
-    ///
     /// let dynamic_image_2 = DynamicImage::new_rgb8(100, 100);
+    ///
     /// let mut thumbnail = Thumbnail::from_dynamic_image("test.jpg", dynamic_image_2);
     /// let mut static_thumbnail = match thumbnail.clone_static_copy() {
     ///     Some(static_tn) => static_tn,
@@ -63,7 +63,9 @@ impl Operation for CombineOp {
     /// };
     ///
     /// let combine_op = CombineOp::new(static_thumbnail, position);
-    /// combine_op.apply(&mut dynamic_image);
+    /// let res = combine_op.apply(&mut dynamic_image);
+    ///
+    /// assert!(res.is_ok());
     /// ```
     fn apply(&self, image: &mut DynamicImage) -> Result<(), OperationError>
     where
@@ -103,32 +105,40 @@ impl Operation for CombineOp {
             }
         };
 
-        let buffer_background = match image.as_mut_rgba8() {
-            Some(rgba_image) => rgba_image,
-            None => {
-                return Err(OperationError::new(
-                    Box::new(self.clone()),
-                    OperationErrorInfo::RgbaImageConversionFailure,
-                ))
-            }
-        };
+        let overlay_image_buffer = self.image.as_dyn().to_rgba();
 
-        match self.image.as_dyn().as_rgba8() {
-            Some(rgba_image) => {
-                for (x, y, pixel) in rgba_image.enumerate_pixels() {
-                    let background_pixel = buffer_background.get_pixel_mut(x + pos_x, y + pos_y);
+        match image.as_mut_rgba8() {
+            Some(background_buffer) => {
+                for (x, y, pixel) in overlay_image_buffer.enumerate_pixels() {
+                    let background_pixel = background_buffer.get_pixel_mut(x + pos_x, y + pos_y);
                     for index in 0..2 {
-                        background_pixel[index] =
-                            pixel[3] * pixel[index] + (1 - pixel[3]) * background_pixel[index];
+                        background_pixel[index] = ((pixel[3] as f32 / 255.0) * pixel[index] as f32
+                            + ((255 - pixel[3]) as f32 / 255.0) * background_pixel[index] as f32)
+                            as u8;
                     }
                 }
             }
-            None => {
-                return Err(OperationError::new(
-                    Box::new(self.clone()),
-                    OperationErrorInfo::RgbaImageConversionFailure,
-                ))
-            }
+            None => match image.as_mut_rgb8() {
+                Some(background_buffer) => {
+                    for (x, y, pixel) in overlay_image_buffer.enumerate_pixels() {
+                        let background_pixel =
+                            background_buffer.get_pixel_mut(x + pos_x, y + pos_y);
+                        for index in 0..2 {
+                            background_pixel[index] = ((pixel[3] as f32 / 255.0)
+                                * pixel[index] as f32
+                                + ((255 - pixel[3]) as f32 / 255.0)
+                                    * background_pixel[index] as f32)
+                                as u8;
+                        }
+                    }
+                }
+                None => {
+                    return Err(OperationError::new(
+                        Box::new(self.clone()),
+                        OperationErrorInfo::RgbImageConversionFailure,
+                    ))
+                }
+            },
         };
 
         Ok(())

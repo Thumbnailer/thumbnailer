@@ -50,11 +50,13 @@ impl Operation for TextOp {
     /// use thumbnailer::thumbnail::operations::TextOp;
     /// use image::DynamicImage;
     ///
-    /// let position = BoxPosition::TopLeft(23, 40);
+    /// let position = BoxPosition::TopLeft(5, 40);
     /// let mut dynamic_image = DynamicImage::new_rgb8(800, 500);
     ///
     /// let text_op = TextOp::new("Hello world!".to_string(), position);
-    /// text_op.apply(&mut dynamic_image);
+    /// let res = text_op.apply(&mut dynamic_image);
+    ///
+    /// assert!(res.is_ok());
     /// ```
     fn apply(&self, image: &mut DynamicImage) -> Result<(), OperationError>
     where

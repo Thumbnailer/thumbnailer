@@ -47,7 +47,9 @@ impl Operation for FlipOp {
     /// let mut dynamic_image = DynamicImage::new_rgb8(800, 500);
     ///
     /// let flip_op = FlipOp::new(orientation);
-    /// flip_op.apply(&mut dynamic_image);
+    /// let res = flip_op.apply(&mut dynamic_image);
+    ///
+    /// assert!(res.is_ok());
     /// ```
     fn apply(&self, image: &mut DynamicImage) -> Result<(), OperationError>
     where
