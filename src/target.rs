@@ -2,7 +2,9 @@ use crate::errors::FileError;
 use crate::thumbnail::data::ThumbnailData;
 use image::{DynamicImage, ImageFormat};
 use std::ffi::OsStr;
-use std::path::PathBuf;
+use std::fs::create_dir_all;
+use std::io;
+use std::path::{Path, PathBuf};
 
 /// The `TargetMethod` type. This sets the file type of the output file.
 #[derive(Debug)]
@@ -117,19 +119,13 @@ impl Target {
         count: Option<u32>,
     ) -> Result<PathBuf, FileError> {
         let orig_path = thumb.get_path();
-        let filename = match orig_path.file_stem() {
-            None => OsStr::new("NAME_MISSING"),
-            Some(name) => name.clone(),
-        };
+        // let filename = match orig_path.file_stem() {
+        //     None => OsStr::new("NAME_MISSING"),
+        //     Some(name) => name.clone(),
+        // };
 
         for item in &self.items {
-            let mut path = if !item.path.is_file() {
-                let mut new_path = item.path.clone();
-                new_path.set_file_name(filename);
-                new_path
-            } else {
-                item.path.clone()
-            };
+            let mut path = compute_and_create_path(&item.path, &orig_path).unwrap();
 
             if let Some(count) = count {
                 let filename = format!(
@@ -157,6 +153,46 @@ impl Target {
         Ok(PathBuf::new())
     }
 }
+
+/// Computes the target file path and ensures that the parent folder exists.
+///
+/// This function takes the user provided destination path, and the filename from the original file path
+/// and determines the actual destination file path.
+///
+/// It does so based on these rules:
+/// * if dst is an existing dir -> Use dst as base path, keep the old filename
+///  * if dst is an existing file -> Save to dst directly
+///  * if dst does not exist:
+/// 	  * if dst end with / or \ -> dst is a folder, create that folder and save file in folder with the old filename
+/// 	  * else -> dst is a path to a filename, save to dst directly
+///
+/// * dst: &PathBuf - The destination path
+/// * src: &PathBuf - The original path of the source image file
+fn compute_and_create_path(dst: &PathBuf, src: &PathBuf) -> Result<PathBuf, io::Error> {
+    let filename = match src.file_stem() {
+        None => OsStr::new("NAME_MISSING"),
+        Some(name) => name.clone(),
+    };
+
+    if dst.is_dir() {
+        // dst is dir and exists
+        return Ok(dst.join(Path::new(filename)));
+    }
+
+    if let Some(dst_str) = dst.to_str() {
+        if dst_str.ends_with("/") || dst_str.ends_with("\\") {
+            create_dir_all(dst)?;
+            return Ok(dst.join(Path::new(filename)));
+        }
+    }
+
+    if let Some(parent) = dst.parent() {
+        create_dir_all(parent)?;
+    }
+
+    Ok(dst.clone())
+}
+
 /// Check if ext matches the expected extension
 ///
 /// * ext: Option<&OsStr> - The actual extension as returned by Path::extension()
