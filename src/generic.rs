@@ -103,40 +103,216 @@ pub enum ResampleFilter {
     Lanczos3,
 }
 
+/// A trait for the queueing of operations
 pub trait OperationContainer {
+    /// Adds an operation to Thumbnails
+    ///
+    /// With this function implemented it should be possible to add single operations to the queue of the object
+    ///
+    /// # Arguments
+    ///
+    /// * `&mut self`: The object that contains a queue for which the function is implemented
+    /// * `op`: The operation that should be added as `Box<dyn Operation>`
     fn add_op(&mut self, op: Box<dyn Operation>);
 }
 
+/// A trait for executing operations on a Thumbnail
 pub trait GenericThumbnail: GenericThumbnailOperations {
+    /// Applies the queued operations of implementors of `GenericImage`
+    ///
+    /// With this function implemented all the operations queued for an object will be executed
+    ///
+    /// # Arguments
+    ///
+    /// * `&mut self`: The object that contains a queue for with operations
     fn apply(&mut self) -> Result<&mut dyn GenericThumbnail, ApplyError>;
+
+    /// Applies the queued operations of implementors of `GenericImage` and stores the result
+    ///
+    /// With this function implemented all the operations queued for an object will be executed and the result will be stored.
+    /// Returns `true` on succuess and `false` in case of an error.
+    ///
+    /// # Arguments
+    ///
+    /// * `self`: The object that contains a queue for with operations
+    /// * `target`: The definition of the target image file as `&Target`
     fn apply_store(self, target: &Target) -> bool;
+
+    /// Applies the queued operations of implementors of `GenericImage` and stores the result
+    ///
+    /// With this function implemented all the operations queued for an object will be executed and the result will be stored.
+    /// Unlike `apply_store()` this function returns a `Result` with a `GenericThumbnail` on success and an `ApplyError` in case of an error.
+    ///
+    /// # Arguments
+    ///
+    /// * `&mut self`: The object that contains a queue for with operations
+    /// * `target`: The definition of the target image file as `&Target`
     fn apply_store_keep(
         &mut self,
         target: &Target,
     ) -> Result<&mut dyn GenericThumbnail, ApplyError>;
 
+    /// Stores a `GenericImage` 
+    ///
+    /// Returns `true` on succuess and `false` in case of an error.
+    ///
+    /// # Arguments
+    ///
+    /// * `self`: The `GenericImage` to be stored
+    /// * `target`: The definition of the target image file as `&Target`
     fn store(self, target: &Target) -> bool;
+
+    /// Stores a `GenericImage` 
+    ///
+    /// Unlike `store()` this function returns a `Result` with a `GenericThumbnail` on success and an `ApplyError` in case of an error.
+    ///
+    /// # Arguments
+    ///
+    /// * `self`: The `GenericImage` to be stored
+    /// * `target`: The definition of the target image file as `&Target`
     fn store_keep(&mut self, target: &Target) -> Result<&mut dyn GenericThumbnail, ApplyError>;
 }
 
+/// The trait for the representation of the operations for a `GenericThumbnail`. These functions contain no logic.
+/// They are used for queueing operations.
 pub trait GenericThumbnailOperations {
+    /// Representation of the resize-operation
+    ///
+    /// This function adds the resize operation to the queue of the oject represented by `&mut self`.
+    /// It returns a `GenericThumbnail`.
+    ///
+    /// # Arguments
+    ///
+    /// * `&mut self` - The object on which resize should be applied
+    /// * `size` - operation options represented by the `Resize` enum
     fn resize(&mut self, size: Resize) -> &mut dyn GenericThumbnail;
+
+    /// Representation of the resize-operation with custom filter
+    ///
+    /// This function adds the resize operation with a custom filter to the queue of the oject represented by `&mut self`.
+    /// It returns a `GenericThumbnail`.
+    ///
+    /// # Arguments
+    ///
+    /// * `&mut self` - The object on which resize should be applied
+    /// * `size` - operation options represented by the `Resize` enum
+    /// * `filter` - the custom filter represented by the `ResampleFilter` enum
     fn resize_filter(&mut self, size: Resize, filter: ResampleFilter) -> &mut dyn GenericThumbnail;
 
+    /// Representation of the blur-operation
+    ///
+    /// This function adds the blur operation to the queue of the oject represented by `&mut self`.
+    /// It returns a `GenericThumbnail`.
+    ///
+    /// # Arguments
+    ///
+    /// * `&mut self` - The object on which blur should be applied
+    /// * `sigma` - value of how much the image should be blurred. [Gaussian Blur] (https://en.wikipedia.org/wiki/Gaussian_blur)
     fn blur(&mut self, sigma: f32) -> &mut dyn GenericThumbnail;
+
+    /// Representation of the brighten-operation
+    ///
+    /// This function adds the brighten operation to the queue of the oject represented by `&mut self`.
+    /// It returns a `GenericThumbnail`.
+    ///
+    /// # Arguments
+    ///
+    /// * `&mut self` - The object on which brighten should be applied
+    /// * `value` - how much the image should be brightened. Positiv values will increase, negative values will decrease brightness.
     fn brighten(&mut self, value: i32) -> &mut dyn GenericThumbnail;
+
+    /// Representation of the hue rotate operation
+    ///
+    /// This function adds the hue rotate operation to the queue of the oject represented by `&mut self`.
+    /// It returns a `GenericThumbnail`.
+    ///
+    /// # Arguments
+    ///
+    /// * `&mut self` - The object on which hue rotate should be applied
+    /// * `degree` - value of degrees to rotate each pixel by
     fn huerotate(&mut self, degree: i32) -> &mut dyn GenericThumbnail;
+
+    /// Representation of the contrast operation
+    ///
+    /// This function adds the contrast operation to the queue of the oject represented by `&mut self`.
+    /// It returns a `GenericThumbnail`.
+    ///
+    /// # Arguments
+    ///
+    /// * `&mut self` - The object on which contrast should be applied
+    /// * `value` - Amount of adjusted contrast. Positiv values will increase, negative values will decrease contrast.
     fn contrast(&mut self, value: f32) -> &mut dyn GenericThumbnail;
+
+    /// Representation of the unsharpen operation
+    ///
+    /// This function adds the unsharpen operation to the queue of the oject represented by `&mut self`.
+    /// It returns a `GenericThumbnail`.
+    ///
+    /// # Arguments
+    ///
+    /// * `&mut self` - The object on which unsharpen should be applied
+    /// * `sigma` as amount to blur the 'DynamicImage'
+    /// * `threshold` as control of how much to sharpen
+    ///
+    /// More information: [Digital unsharp masking](https://en.wikipedia.org/wiki/Unsharp_masking#Digital_unsharp_masking)
     fn unsharpen(&mut self, sigma: f32, threshold: i32) -> &mut dyn GenericThumbnail;
 
+    /// Representation of the crop operation
+    ///
+    /// This function adds the crop operation to the queue of the oject represented by `&mut self`.
+    /// It returns a `GenericThumbnail`.
+    ///
+    /// # Arguments
+    ///
+    /// * `&mut self` - The object on which crop should be applied
+    /// * `c` - Options for the operation represented by the `Crop` enum
     fn crop(&mut self, c: Crop) -> &mut dyn GenericThumbnail;
+
+    /// Representation of the flip operation
+    ///
+    /// This function adds the crop operation to the queue of the oject represented by `&mut self`.
+    /// It returns a `GenericThumbnail`.
+    ///
+    /// # Arguments
+    ///
+    /// * `&mut self` - The object on which flip should be applied
+    /// * `orientation` - Options for the operation represented by the `Orientation` enum
     fn flip(&mut self, orientation: Orientation) -> &mut dyn GenericThumbnail;
 
+    /// Representation of the invert operation
+    ///
+    /// This function adds the invert operation to the queue of the oject represented by `&mut self`.
+    /// It returns a `GenericThumbnail`.
+    ///
+    /// # Arguments
+    ///
+    /// * `&mut self` - The object on which invert should be applied
     fn invert(&mut self) -> &mut dyn GenericThumbnail;
 
     fn exif(&mut self, metadata: Exif) -> &mut dyn GenericThumbnail;
+
+    /// Representation of the draw-text operation
+    ///
+    /// This function adds the draw-text operation to the queue of the oject represented by `&mut self`.
+    /// It returns a `GenericThumbnail`.
+    ///
+    /// # Arguments
+    ///
+    /// * `&mut self` - The object on which draw-text should be applied
+    /// * `text` - The text that should be drawn
+    /// * `pos` - The position of the text represented by the `BoxPosition` enum
     fn text(&mut self, text: String, pos: BoxPosition) -> &mut dyn GenericThumbnail;
 
+    /// Representation of the combine operation
+    ///
+    /// This function adds the combine operation to the queue of the oject represented by `&mut self`.
+    /// It returns a `GenericThumbnail`.
+    ///
+    /// # Arguments
+    ///
+    /// * `&mut self` - The object on which combine should be applied
+    /// * `image` - The image that should be drawn on `self`
+    /// * `pos` - The position of `image` represented by the `BoxPosition` enum
     fn combine(&mut self, image: StaticThumbnail, pos: BoxPosition) -> &mut dyn GenericThumbnail;
 }
 
@@ -144,51 +320,184 @@ impl<T> GenericThumbnailOperations for T
 where
     T: OperationContainer + GenericThumbnail,
 {
+    /// Representation of the resize operation without custom filter
+    ///
+    /// This function adds `ResizeOp` without the optional filter to the queue of a `GenericThumbnail` represented by `&mut self`.
+    /// It returns itself after that.
+    ///
+    /// # Arguments
+    ///
+    /// * `&mut self` - The object on which `ResizeOp` should be applied
+    /// * `size` - operation options represented by the `Resize` enum
+    ///
+    /// # Panic
+    ///
+    /// This function won't panic
     fn resize(&mut self, size: Resize) -> &mut dyn GenericThumbnail {
         self.add_op(Box::new(ResizeOp::new(size, None)));
         self
     }
 
+    /// Representation of the resize operation with custom filter
+    ///
+    /// This function adds `ResizeOp` with the optional filter to the queue of a `GenericThumbnail` represented by `&mut self`.
+    /// It returns itself after that.
+    ///
+    /// # Arguments
+    ///
+    /// * `&mut self` - The object on which `ResizeOp` should be applied
+    /// * `size` - operation options represented by the `Resize` enum
+    /// * `filter` - the custom filter represented by the `ResampleFilter` enum
+    ///
+    /// # Panic
+    ///
+    /// This function won't panic
     fn resize_filter(&mut self, size: Resize, filter: ResampleFilter) -> &mut dyn GenericThumbnail {
         self.add_op(Box::new(ResizeOp::new(size, Option::from(filter))));
         self
     }
 
+    /// Representation of the blur operation
+    ///
+    /// This function adds `BlurOp` to the queue of a `GenericThumbnail` represented by `&mut self`.
+    /// It returns itself after that.
+    ///
+    /// # Arguments
+    ///
+    /// * `&mut self` - The object on which `BlurOp` should be applied
+    /// * `sigma` - value of how much the image should be blurred. [Gaussian Blur] (https://en.wikipedia.org/wiki/Gaussian_blur)
+    ///
+    /// # Panic
+    ///
+    /// This function won't panic
     fn blur(&mut self, sigma: f32) -> &mut dyn GenericThumbnail {
         self.add_op(Box::new(BlurOp::new(sigma)));
         self
     }
 
+    /// Representation of the brighten operation
+    ///
+    /// This function adds `BrightenOp` to the queue of a `GenericThumbnail` represented by `&mut self`.
+    /// It returns itself after that.
+    ///
+    /// # Arguments
+    ///
+    /// * `&mut self` - The object on which `BrightenOp` should be applied
+    /// * `value` - how much the image should be brightened. Positiv values will increase, negative values will decrease brightness.
+    ///
+    /// # Panic
+    ///
+    /// This function won't panic
     fn brighten(&mut self, value: i32) -> &mut dyn GenericThumbnail {
         self.add_op(Box::new(BrightenOp::new(value)));
         self
     }
 
+    /// Representation of the hue rotate operation
+    ///
+    /// This function adds `HuerotateOp` to the queue of a `GenericThumbnail` represented by `&mut self`.
+    /// It returns itself after that.
+    ///
+    /// # Arguments
+    ///
+    /// * `&mut self` - The object on which `HuerotateOp` should be applied
+    /// * `degree` - value of degrees to rotate each pixel by
+    ///
+    /// # Panic
+    ///
+    /// This function won't panic
     fn huerotate(&mut self, degree: i32) -> &mut dyn GenericThumbnail {
         self.add_op(Box::new(HuerotateOp::new(degree)));
         self
     }
 
+    /// Representation of the contrast operation
+    ///
+    /// This function adds `ContrastOp` to the queue of a `GenericThumbnail` represented by `&mut self`.
+    /// It returns itself after that.
+    ///
+    /// # Arguments
+    ///
+    /// * `&mut self` - The object on which `ContrastOp` should be applied
+    /// * `value` - Amount of adjusted contrast. Positiv values will increase, negative values will decrease contrast.
+    ///
+    /// # Panic
+    ///
+    /// This function won't panic
     fn contrast(&mut self, value: f32) -> &mut dyn GenericThumbnail {
         self.add_op(Box::new(ContrastOp::new(value)));
         self
     }
 
+    /// Representation of the unsharpen operation
+    ///
+    /// This function adds `UnsharpenOp` to the queue of a `GenericThumbnail` represented by `&mut self`.
+    /// It returns itself after that.
+    ///
+    /// # Arguments
+    ///
+    /// * `&mut self` - The object on which `UnsharpenOp` should be applied
+    /// * `sigma` as amount to blur the 'DynamicImage'
+    /// * `threshold` as control of how much to sharpen
+    ///
+    /// More information: [Digital unsharp masking](https://en.wikipedia.org/wiki/Unsharp_masking#Digital_unsharp_masking)
+    ///
+    /// # Panic
+    ///
+    /// This function won't panic
     fn unsharpen(&mut self, sigma: f32, threshold: i32) -> &mut dyn GenericThumbnail {
         self.add_op(Box::new(UnsharpenOp::new(sigma, threshold)));
         self
     }
 
+    /// Representation of the crop operation
+    ///
+    /// This function adds `CropOp` to the queue of a `GenericThumbnail` represented by `&mut self`.
+    /// It returns itself after that.
+    ///
+    /// # Arguments
+    ///
+    /// * `&mut self` - The object on which `CropOp` should be applied
+    /// * `c` - Options for the operation represented by the `Crop` enum
+    ///
+    /// # Panic
+    ///
+    /// This function won't panic
     fn crop(&mut self, c: Crop) -> &mut dyn GenericThumbnail {
         self.add_op(Box::new(CropOp::new(c)));
         self
     }
 
+    /// Representation of the flip operation
+    ///
+    /// This function adds `FlipOp` to the queue of a `GenericThumbnail` represented by `&mut self`.
+    /// It returns itself after that.
+    ///
+    /// # Arguments
+    ///
+    /// * `&mut self` - The object on which `InvertOp` should be applied
+    /// * `orientation` -  Options for the operation represented by the `Orientation` enum
+    ///
+    /// # Panic
+    ///
+    /// This function won't panic
     fn flip(&mut self, orientation: Orientation) -> &mut dyn GenericThumbnail {
         self.add_op(Box::new(FlipOp::new(orientation)));
         self
     }
 
+    /// Representation of the invert operation
+    ///
+    /// This function adds `InvertOp` to the queue of a `GenericThumbnail` represented by `&mut self`.
+    /// It returns itself after that.
+    ///
+    /// # Arguments
+    ///
+    /// * `&mut self` - The object on which `InvertOp` should be applied
+    ///
+    /// # Panic
+    ///
+    /// This function won't panic
     fn invert(&mut self) -> &mut dyn GenericThumbnail {
         self.add_op(Box::new(InvertOp::new()));
         self
@@ -199,11 +508,39 @@ where
         self
     }
 
+    /// Representation of the draw-text operation
+    ///
+    /// This function adds `TextOp` to the queue of a `GenericThumbnail` represented by `&mut self`.
+    /// It returns itself after that.
+    ///
+    /// # Arguments
+    ///
+    /// * `&mut self` - The object on which `TextOp` should be applied
+    /// * `text` - The text that should be drawn on `self`
+    /// * `pos` - The position of `text` represented by the `BoxPosition` enum
+    ///
+    /// # Panic
+    ///
+    /// This function won't panic
     fn text(&mut self, text: String, pos: BoxPosition) -> &mut dyn GenericThumbnail {
         self.add_op(Box::new(TextOp::new(text, pos)));
         self
     }
 
+    /// Representation of the combine operation
+    ///
+    /// This function adds `CombineOp` to the queue of a `GenericThumbnail` represented by `&mut self`.
+    /// It returns itself after that.
+    ///
+    /// # Arguments
+    ///
+    /// * `&mut self` - The object on which `CombineOp` should be applied
+    /// * `image` - The image that should be drawn on `self`
+    /// * `pos` - The position of `image` represented by the `BoxPosition` enum
+    ///
+    /// # Panic
+    ///
+    /// This function won't panic
     fn combine(&mut self, image: StaticThumbnail, pos: BoxPosition) -> &mut dyn GenericThumbnail {
         self.add_op(Box::new(CombineOp::new(image, pos)));
         self
