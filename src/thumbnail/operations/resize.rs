@@ -35,7 +35,7 @@ impl Operation for ResizeOp {
     ///
     /// # Panic
     ///
-    /// This function won't panic ?
+    /// This function won't panic.
     ///
     /// # Examples
     /// ```
