@@ -118,7 +118,7 @@ pub trait OperationContainer {
 
 /// A trait for executing operations on a Thumbnail
 pub trait GenericThumbnail: GenericThumbnailOperations {
-    /// Applies the queued operations of implementors of `GenericImage`
+    /// Applies the queued operations of implementors of `GenericImage` and clears the queue
     ///
     /// With this function implemented all the operations queued for an object will be executed
     ///
@@ -127,7 +127,7 @@ pub trait GenericThumbnail: GenericThumbnailOperations {
     /// * `&mut self`: The object that contains a queue for with operations
     fn apply(&mut self) -> Result<&mut dyn GenericThumbnail, ApplyError>;
 
-    /// Applies the queued operations of implementors of `GenericImage` and stores the result
+    /// Applies the queued operations of implementors of `GenericImage` and stores the result to the given `Target`
     ///
     /// With this function implemented all the operations queued for an object will be executed and the result will be stored.
     /// Returns `true` on succuess and `false` in case of an error.
@@ -138,10 +138,11 @@ pub trait GenericThumbnail: GenericThumbnailOperations {
     /// * `target`: The definition of the target image file as `&Target`
     fn apply_store(self, target: &Target) -> bool;
 
-    /// Applies the queued operations of implementors of `GenericImage` and stores the result
+    /// Applies the queued operations of implementors of `GenericImage`, stores the result, and clears the queue
     ///
     /// With this function implemented all the operations queued for an object will be executed and the result will be stored.
-    /// Unlike `apply_store()` this function returns a `Result` with a `GenericThumbnail` on success and an `ApplyError` in case of an error.
+    /// Unlike `apply_store()` this function does not consume the object and instead
+    /// returns a `Result` with a `GenericThumbnail` on success and an `ApplyError` in case of an error
     ///
     /// # Arguments
     ///
@@ -160,16 +161,23 @@ pub trait GenericThumbnail: GenericThumbnailOperations {
     ///
     /// * `self`: The `GenericImage` to be stored
     /// * `target`: The definition of the target image file as `&Target`
+    ///
+    /// # Attention
+    /// If apply was not called before, the image will be saved unmodified.
     fn store(self, target: &Target) -> bool;
 
     /// Stores a `GenericImage`
     ///
-    /// Unlike `store()` this function returns a `Result` with a `GenericThumbnail` on success and an `ApplyError` in case of an error.
+    /// Unlike `store()` this function does not consume the object
+    /// and instead returns a `Result` with a `GenericThumbnail` on success
+    /// and an `ApplyError` in case of an error.
     ///
     /// # Arguments
     ///
     /// * `self`: The `GenericImage` to be stored
     /// * `target`: The definition of the target image file as `&Target`
+    /// # Attention
+    /// If apply was not called before, the image will be saved unmodified.
     fn store_keep(&mut self, target: &Target) -> Result<&mut dyn GenericThumbnail, ApplyError>;
 }
 
