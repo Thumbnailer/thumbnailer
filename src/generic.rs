@@ -152,7 +152,7 @@ pub trait GenericThumbnail: GenericThumbnailOperations {
         target: &Target,
     ) -> Result<&mut dyn GenericThumbnail, ApplyError>;
 
-    /// Stores a `GenericImage` 
+    /// Stores a `GenericImage`
     ///
     /// Returns `true` on succuess and `false` in case of an error.
     ///
@@ -162,7 +162,7 @@ pub trait GenericThumbnail: GenericThumbnailOperations {
     /// * `target`: The definition of the target image file as `&Target`
     fn store(self, target: &Target) -> bool;
 
-    /// Stores a `GenericImage` 
+    /// Stores a `GenericImage`
     ///
     /// Unlike `store()` this function returns a `Result` with a `GenericThumbnail` on success and an `ApplyError` in case of an error.
     ///
