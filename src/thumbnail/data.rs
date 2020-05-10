@@ -97,6 +97,13 @@ impl ThumbnailData {
         ThumbnailData { path, image }
     }
 
+    pub(crate) fn from_dynamic_image(path_name: &str, dynamic_image: DynamicImage) -> Self {
+        let path = PathBuf::from(path_name);
+        let image = ImageData::Image(dynamic_image);
+
+        ThumbnailData { path, image }
+    }
+
     /// Gets the `DynamicImage` stored inside a `ImageData` instance.
     ///
     /// If the dynamic image has not yet been loaded,
