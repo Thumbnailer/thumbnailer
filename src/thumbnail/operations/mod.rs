@@ -1,6 +1,7 @@
 use image::DynamicImage;
 use std::fmt::Debug;
 
+// Include all submodules
 pub mod blur;
 pub mod brighten;
 pub mod combine;
@@ -27,11 +28,16 @@ pub use resize::ResizeOp;
 pub use text::TextOp;
 pub use unsharpen::UnsharpenOp;
 
+/// The `Operation` trait.
+///
+/// This trait allows the dynamic implementation of the actual methods which apply modifications to the image.
+/// Passing the image to the apply function should perform the desired modifications to it.
 pub trait Operation: OperationClone + Debug + Send + Sync {
     fn apply(&self, image: &mut DynamicImage) -> bool;
 }
 
 pub trait OperationClone {
+    /// Clones the `Operation` instance into a `Box<dyn Operation>`
     fn box_clone(&self) -> Box<dyn Operation>;
 }
 
