@@ -2,7 +2,7 @@ pub use crate::errors::OperationError;
 use crate::thumbnail::operations::Operation;
 use image::DynamicImage;
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Default)]
 /// Representation of the invert-operation as struct
 pub struct InvertOp;
 

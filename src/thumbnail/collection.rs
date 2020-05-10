@@ -49,6 +49,12 @@ impl ThumbnailCollectionBuilder {
     }
 }
 
+impl Default for ThumbnailCollectionBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[derive(Debug)]
 pub struct ThumbnailCollection {
     images: Vec<ThumbnailData>,

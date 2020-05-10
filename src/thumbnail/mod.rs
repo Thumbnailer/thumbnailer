@@ -83,16 +83,13 @@ impl Thumbnail {
         }
 
         match Reader::open(path) {
-            Err(_) => return false,
-            Ok(reader) => match reader.format() {
-                Some(_) => true,
-                None => false,
-            },
+            Err(_) => false,
+            Ok(reader) => reader.format().is_some(),
         }
     }
 
-    pub(crate) fn get_dyn_image<'a>(&mut self) -> Result<&mut image::DynamicImage, FileError> {
-        return self.data.get_dyn_image();
+    pub(crate) fn get_dyn_image(&mut self) -> Result<&mut image::DynamicImage, FileError> {
+        self.data.get_dyn_image()
     }
 }
 

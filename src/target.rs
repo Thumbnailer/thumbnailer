@@ -133,10 +133,12 @@ impl Target {
                 let filename = format!(
                     "{}-{}.{}",
                     path.file_stem()
-                        .unwrap_or(OsStr::new("NAME_MISSING"))
+                        .unwrap_or_else(|| OsStr::new("NAME_MISSING"))
                         .to_string_lossy(),
                     count,
-                    path.extension().unwrap_or(OsStr::new("")).to_string_lossy()
+                    path.extension()
+                        .unwrap_or_else(|| OsStr::new(""))
+                        .to_string_lossy()
                 );
                 path.set_file_name(filename);
             }
@@ -165,17 +167,17 @@ impl Target {
 ///
 /// It does so based on these rules:
 /// * if dst is an existing dir -> Use dst as base path, keep the old filename
-///  * if dst is an existing file -> Save to dst directly
-///  * if dst does not exist:
-/// 	  * if dst end with / or \ -> dst is a folder, create that folder and save file in folder with the old filename
-/// 	  * else -> dst is a path to a filename, save to dst directly
+/// * if dst is an existing file -> Save to dst directly
+/// * if dst does not exist:
+///   * if dst end with / or \ -> dst is a folder, create that folder and save file in folder with the old filename
+///   * else -> dst is a path to a filename, save to dst directly
 ///
 /// * dst: &PathBuf - The destination path
 /// * src: &PathBuf - The original path of the source image file
 fn compute_and_create_path(dst: &PathBuf, src: &PathBuf) -> Result<PathBuf, io::Error> {
     let filename = match src.file_stem() {
         None => OsStr::new("NAME_MISSING"),
-        Some(name) => name.clone(),
+        Some(name) => name,
     };
 
     if dst.is_dir() {
@@ -184,7 +186,7 @@ fn compute_and_create_path(dst: &PathBuf, src: &PathBuf) -> Result<PathBuf, io::
     }
 
     if let Some(dst_str) = dst.to_str() {
-        if dst_str.ends_with("/") || dst_str.ends_with("\\") {
+        if dst_str.ends_with('/') || dst_str.ends_with('\\') {
             create_dir_all(dst)?;
             return Ok(dst.join(Path::new(filename)));
         }

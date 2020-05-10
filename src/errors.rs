@@ -100,7 +100,7 @@ pub struct OperationError {
 
 impl OperationError {
     pub fn new(op: Box<dyn Operation>, info: OperationErrorInfo) -> Self {
-        OperationError { op: op, info: info }
+        OperationError { op, info }
     }
 }
 

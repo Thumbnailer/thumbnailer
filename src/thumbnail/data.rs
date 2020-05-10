@@ -82,7 +82,7 @@ impl ThumbnailData {
         };
 
         Ok(ThumbnailData {
-            path: path.to_path_buf(),
+            path,
             image: ImageData::File(reader.into_inner().into_inner(), format),
         })
     }
@@ -120,7 +120,7 @@ impl ThumbnailData {
     /// # Errors
     /// Returns an InternalError of there was a problem loading the image data from the file system
     /// or accessing the `DynamicImage` instance
-    pub(crate) fn get_dyn_image<'a>(&mut self) -> Result<&mut image::DynamicImage, FileError> {
+    pub(crate) fn get_dyn_image(&mut self) -> Result<&mut image::DynamicImage, FileError> {
         if let ImageData::File(file, format) = &self.image {
             let mut reader = Reader::new(BufReader::new(file));
             reader.set_format(*format);
@@ -138,10 +138,10 @@ impl ThumbnailData {
             self.image = ImageData::Image(dyn_image);
         }
 
-        return match &mut self.image {
+        match &mut self.image {
             ImageData::Image(image) => Ok(image),
             ImageData::File(_, _) => Err(FileError::UnknownError),
-        };
+        }
     }
 
     /// Ensures the image data is in memory then clones the `ThumbnailData` instance
@@ -183,7 +183,7 @@ impl ThumbnailData {
     /// Returns a `ApplyError` if a operation fails.
     pub(crate) fn apply_ops_list(
         &mut self,
-        ops: &Vec<Box<dyn Operation>>,
+        ops: &[Box<dyn Operation>],
     ) -> Result<&mut Self, ApplyError> {
         if let Err(err) = self.get_dyn_image() {
             return Err(ApplyError::LoadingImageError(err));
