@@ -41,6 +41,16 @@ impl Thumbnail {
         })
     }
 
+    /// This function creates and returns a new `Thumbnail` from an existing DynamicImage.
+    ///
+    /// # Arguments
+    ///
+    /// * `path_name` - A custom path for the new `Thumbnail`
+    /// * `dynamic_image` - The `DynamicImage` that should be contained in the `Thumbnail`
+    ///
+    /// # Panic
+    ///
+    /// This function won't panic.
     pub fn from_dynamic_image(path_name: &str, dynamic_image: DynamicImage) -> Self {
         Thumbnail {
             data: ThumbnailData::from_dynamic_image(path_name, dynamic_image),
