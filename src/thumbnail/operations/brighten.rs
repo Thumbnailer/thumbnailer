@@ -32,7 +32,7 @@ impl Operation for BrightenOp {
     ///
     /// # Panic
     ///
-    /// This function won't panic ?
+    /// This function won't panic.
     ///
     /// # Examples
     /// ```
