@@ -1,4 +1,4 @@
-use crate::errors::FileError;
+use crate::errors::{FileError, FileNotSupportedError};
 use crate::thumbnail::data::ThumbnailData;
 use image::{DynamicImage, ImageFormat};
 use std::ffi::OsStr;
@@ -117,15 +117,17 @@ impl Target {
         &self,
         thumb: &mut ThumbnailData,
         count: Option<u32>,
-    ) -> Result<PathBuf, FileError> {
+    ) -> Result<Vec<PathBuf>, FileError> {
         let orig_path = thumb.get_path();
         // let filename = match orig_path.file_stem() {
         //     None => OsStr::new("NAME_MISSING"),
         //     Some(name) => name.clone(),
         // };
 
+        let mut result = vec![];
+
         for item in &self.items {
-            let mut path = compute_and_create_path(&item.path, &orig_path).unwrap();
+            let mut path = compute_and_create_path(&item.path, &orig_path)?;
 
             if let Some(count) = count {
                 let filename = format!(
@@ -141,16 +143,18 @@ impl Target {
 
             let dyn_image = thumb.get_dyn_image()?;
 
-            let path = match item.method {
-                TargetFormat::Jpeg => store_jpg(dyn_image, path),
-                TargetFormat::Png => store_png(dyn_image, path),
-                TargetFormat::Tiff => store_tiff(dyn_image, path),
-                TargetFormat::Bmp => store_bmp(dyn_image, path),
-                TargetFormat::Gif => store_gif(dyn_image, path),
+            let new_path = match item.method {
+                TargetFormat::Jpeg => store_jpg(dyn_image, path)?,
+                TargetFormat::Png => store_png(dyn_image, path)?,
+                TargetFormat::Tiff => store_tiff(dyn_image, path)?,
+                TargetFormat::Bmp => store_bmp(dyn_image, path)?,
+                TargetFormat::Gif => store_gif(dyn_image, path)?,
             };
+
+            result.push(new_path);
         }
 
-        Ok(PathBuf::new())
+        Ok(result)
     }
 }
 
@@ -210,14 +214,19 @@ fn ensure_ext(ext: Option<&OsStr>, expected: &str) -> bool {
 ///
 /// * image: &DynamicImage - The image data
 /// * dst: PathBuf - The destination path
-fn store_jpg(image: &DynamicImage, mut dst: PathBuf) -> PathBuf {
+fn store_jpg(image: &DynamicImage, mut dst: PathBuf) -> Result<PathBuf, FileError> {
     if !ensure_ext(dst.extension(), "jpg") && !ensure_ext(dst.extension(), "jpeg") {
         dst.set_extension(OsStr::new("jpg"));
     }
 
-    image.save_with_format(dst.clone(), ImageFormat::Jpeg);
+    if image
+        .save_with_format(dst.clone(), ImageFormat::Jpeg)
+        .is_err()
+    {
+        return Err(FileError::NotSupported(FileNotSupportedError::new(dst)));
+    }
 
-    dst
+    Ok(dst)
 }
 /// Stores `DynamicImage` as PNG to the given path.
 ///
@@ -225,14 +234,19 @@ fn store_jpg(image: &DynamicImage, mut dst: PathBuf) -> PathBuf {
 ///
 /// * image: &DynamicImage - The image data
 /// * dst: PathBuf - The destination path
-fn store_png(image: &DynamicImage, mut dst: PathBuf) -> PathBuf {
+fn store_png(image: &DynamicImage, mut dst: PathBuf) -> Result<PathBuf, FileError> {
     if !ensure_ext(dst.extension(), "png") {
         dst.set_extension(OsStr::new("png"));
     }
 
-    image.save_with_format(dst.clone(), ImageFormat::Png);
+    if image
+        .save_with_format(dst.clone(), ImageFormat::Png)
+        .is_err()
+    {
+        return Err(FileError::NotSupported(FileNotSupportedError::new(dst)));
+    }
 
-    dst
+    Ok(dst)
 }
 
 /// Stores `DynamicImage` as TIFF to the given path.
@@ -241,14 +255,19 @@ fn store_png(image: &DynamicImage, mut dst: PathBuf) -> PathBuf {
 ///
 /// * image: &DynamicImage - The image data
 /// * dst: PathBuf - The destination path
-fn store_tiff(image: &DynamicImage, mut dst: PathBuf) -> PathBuf {
+fn store_tiff(image: &DynamicImage, mut dst: PathBuf) -> Result<PathBuf, FileError> {
     if !ensure_ext(dst.extension(), "tif") && !ensure_ext(dst.extension(), "tiff") {
         dst.set_extension(OsStr::new("tiff"));
     }
 
-    image.save_with_format(dst.clone(), ImageFormat::Tiff);
+    if image
+        .save_with_format(dst.clone(), ImageFormat::Tiff)
+        .is_err()
+    {
+        return Err(FileError::NotSupported(FileNotSupportedError::new(dst)));
+    }
 
-    dst
+    Ok(dst)
 }
 
 /// Stores `DynamicImage` as BMP to the given path.
@@ -257,14 +276,19 @@ fn store_tiff(image: &DynamicImage, mut dst: PathBuf) -> PathBuf {
 ///
 /// * image: &DynamicImage - The image data
 /// * dst: PathBuf - The destination path
-fn store_bmp(image: &DynamicImage, mut dst: PathBuf) -> PathBuf {
+fn store_bmp(image: &DynamicImage, mut dst: PathBuf) -> Result<PathBuf, FileError> {
     if !ensure_ext(dst.extension(), "bmp") {
         dst.set_extension(OsStr::new("bmp"));
     }
 
-    image.save_with_format(dst.clone(), ImageFormat::Bmp);
+    if image
+        .save_with_format(dst.clone(), ImageFormat::Bmp)
+        .is_err()
+    {
+        return Err(FileError::NotSupported(FileNotSupportedError::new(dst)));
+    }
 
-    dst
+    Ok(dst)
 }
 /// Stores `DynamicImage` as GIF to the given path.
 ///
@@ -272,12 +296,17 @@ fn store_bmp(image: &DynamicImage, mut dst: PathBuf) -> PathBuf {
 ///
 /// * image: &DynamicImage - The image data
 /// * dst: PathBuf - The destination path
-fn store_gif(image: &DynamicImage, mut dst: PathBuf) -> PathBuf {
+fn store_gif(image: &DynamicImage, mut dst: PathBuf) -> Result<PathBuf, FileError> {
     if !ensure_ext(dst.extension(), "gif") {
         dst.set_extension(OsStr::new("gif"));
     }
 
-    image.save_with_format(dst.clone(), ImageFormat::Gif);
+    if image
+        .save_with_format(dst.clone(), ImageFormat::Gif)
+        .is_err()
+    {
+        return Err(FileError::NotSupported(FileNotSupportedError::new(dst)));
+    }
 
-    dst
+    Ok(dst)
 }

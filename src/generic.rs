@@ -4,6 +4,7 @@ use crate::thumbnail::operations::{
     Operation, ResizeOp, RotateOp, TextOp, UnsharpenOp,
 };
 use crate::{StaticThumbnail, Target};
+use std::path::PathBuf;
 
 #[derive(Debug, Copy, Clone)]
 /// The different options for the resize-operation as an enum
@@ -147,7 +148,7 @@ pub trait GenericThumbnail: GenericThumbnailOperations {
     ///
     /// * `self`: The object that contains a queue for with operations
     /// * `target`: The definition of the target image file as `&Target`
-    fn apply_store(self, target: &Target) -> bool;
+    fn apply_store(self, target: &Target) -> Result<Vec<PathBuf>, ApplyError>;
 
     /// Applies the queued operations of implementors of `GenericImage`, stores the result, and clears the queue
     ///
@@ -159,10 +160,7 @@ pub trait GenericThumbnail: GenericThumbnailOperations {
     ///
     /// * `&mut self`: The object that contains a queue for with operations
     /// * `target`: The definition of the target image file as `&Target`
-    fn apply_store_keep(
-        &mut self,
-        target: &Target,
-    ) -> Result<&mut dyn GenericThumbnail, ApplyError>;
+    fn apply_store_keep(&mut self, target: &Target) -> Result<Vec<PathBuf>, ApplyError>;
 
     /// Stores a `GenericImage`
     ///
@@ -175,7 +173,7 @@ pub trait GenericThumbnail: GenericThumbnailOperations {
     ///
     /// # Attention
     /// If apply was not called before, the image will be saved unmodified.
-    fn store(self, target: &Target) -> bool;
+    fn store(self, target: &Target) -> Result<Vec<PathBuf>, ApplyError>;
 
     /// Stores a `GenericImage`
     ///
@@ -189,7 +187,7 @@ pub trait GenericThumbnail: GenericThumbnailOperations {
     /// * `target`: The definition of the target image file as `&Target`
     /// # Attention
     /// If apply was not called before, the image will be saved unmodified.
-    fn store_keep(&mut self, target: &Target) -> Result<&mut dyn GenericThumbnail, ApplyError>;
+    fn store_keep(&mut self, target: &Target) -> Result<Vec<PathBuf>, ApplyError>;
 }
 
 /// The trait for the representation of the operations for a `GenericThumbnail`. These functions contain no logic.

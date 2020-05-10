@@ -1,10 +1,7 @@
-use crate::errors;
-use crate::errors::{
-    ApplyError, FileError, FileNotFoundError, FileNotSupportedError, InternalError,
-};
+use crate::errors::{ApplyError, FileError, FileNotFoundError, FileNotSupportedError};
 use crate::thumbnail::operations::Operation;
 use image::io::Reader;
-use image::{DynamicImage, ImageFormat};
+use image::{DynamicImage, ImageError, ImageFormat};
 use std::fmt;
 use std::fmt::Formatter;
 use std::fs::File;
@@ -79,7 +76,7 @@ impl ThumbnailData {
 
                 match reader.format() {
                     Some(f) => f,
-                    None => return Err(FileError::NotSupported(FileNotSupportedError { path })),
+                    None => return Err(FileError::NotSupported(FileNotSupportedError::new(path))),
                 }
             }
         };
@@ -93,9 +90,9 @@ impl ThumbnailData {
     /// Creates a new `ThumbnailData` from the given ImageData.
     ///
     /// While this takes a path, this is just additional information, nothing is read from that path.
-    pub(crate) fn new(path: PathBuf, image: ImageData) -> Self {
-        ThumbnailData { path, image }
-    }
+    // pub(crate) fn new(path: PathBuf, image: ImageData) -> Self {
+    //     ThumbnailData { path, image }
+    // }
 
     /// This function creates and returns a new `ThumbnailData` from an existing DynamicImage.
     ///
@@ -123,16 +120,27 @@ impl ThumbnailData {
     /// # Errors
     /// Returns an InternalError of there was a problem loading the image data from the file system
     /// or accessing the `DynamicImage` instance
-    pub(crate) fn get_dyn_image<'a>(&mut self) -> Result<&mut image::DynamicImage, InternalError> {
+    pub(crate) fn get_dyn_image<'a>(&mut self) -> Result<&mut image::DynamicImage, FileError> {
         if let ImageData::File(file, format) = &self.image {
             let mut reader = Reader::new(BufReader::new(file));
             reader.set_format(*format);
-            self.image = ImageData::Image(reader.decode()?);
+            let dyn_image = match reader.decode() {
+                Ok(i) => i,
+                Err(error) => {
+                    return match error {
+                        ImageError::Unsupported(_) => Err(FileError::NotSupported(
+                            FileNotSupportedError::new(self.path.clone()),
+                        )),
+                        _ => Err(FileError::UnknownError),
+                    }
+                }
+            };
+            self.image = ImageData::Image(dyn_image);
         }
 
         return match &mut self.image {
             ImageData::Image(image) => Ok(image),
-            ImageData::File(_, _) => Err(InternalError::UnknownError(errors::UnknownError)),
+            ImageData::File(_, _) => Err(FileError::UnknownError),
         };
     }
 
@@ -157,9 +165,9 @@ impl ThumbnailData {
     ///
     /// This checks whether the image data is already loaded to memory. If not it loads it.
     /// If the loading fails it returns false.
-    fn assert_dynamic_image_loaded(&mut self) -> bool {
-        self.get_dyn_image().is_ok()
-    }
+    // fn assert_dynamic_image_loaded(&mut self) -> bool {
+    //     self.get_dyn_image().is_ok()
+    // }
 
     /// Gets the original path of the image (from where it has been loaded)
     pub fn get_path(&self) -> PathBuf {
@@ -177,8 +185,8 @@ impl ThumbnailData {
         &mut self,
         ops: &Vec<Box<dyn Operation>>,
     ) -> Result<&mut Self, ApplyError> {
-        if !self.assert_dynamic_image_loaded() {
-            return Err(ApplyError::LoadingImageError);
+        if let Err(err) = self.get_dyn_image() {
+            return Err(ApplyError::LoadingImageError(err));
         }
 
         if let Ok(image) = &mut self.get_dyn_image() {
