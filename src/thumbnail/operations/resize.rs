@@ -58,7 +58,7 @@ impl Operation for ResizeOp {
             Some(rgb_image) => rgb_image.width() as f32 / rgb_image.height() as f32,
             _ => {
                 return Err(OperationError::new(
-                    Box::new(self.clone()),
+                    Box::new(*self),
                     OperationErrorInfo::RgbImageConversionFailure,
                 ))
             }
