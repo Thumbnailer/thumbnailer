@@ -18,7 +18,7 @@ impl Operation for InvertOp {
     ///
     /// This function inverts the colors in a `Dynamic-Image`.
     /// More information: [Negative colors](https://en.wikipedia.org/wiki/Negative_(photography))
-    /// It returns `true` on success and `false` in case of an error.
+    /// It returns `Ok(())` on success and `Err(OperationError)` in case of an error.
     ///
     /// # Arguments
     ///

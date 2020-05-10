@@ -26,7 +26,7 @@ impl Operation for CropOp {
     /// * with `Crop::Ratio`: Crops the image to a rectangle given by a width-height-ratio. The rectangle is scaled to the maximum that fits
     /// inside the image
     ///
-    /// It returns `true` on success and `false` in case of an error.
+    /// It returns `Ok(())` on success and `Err(OperationError)` in case of an error.
     ///
     /// # Arguments
     ///

@@ -25,7 +25,7 @@ impl Operation for FlipOp {
     /// * with `Orientation::Vertical`: Flips the image vertically.
     /// * with `Orientation::Horizontal`: Flips the image horizontally.
     ///
-    /// It returns `true` on success and `false` in case of an error.
+    /// It returns `Ok(())` on success and `Err(OperationError)` in case of an error.
     ///
     /// # Arguments
     ///

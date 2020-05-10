@@ -27,7 +27,7 @@ impl Operation for UnsharpenOp {
     ///
     /// This function unsharpens a `DynamicImage` based on the given `UnsharpenOp`
     /// Mathematical background: [Digital unsharp masking](https://en.wikipedia.org/wiki/Unsharp_masking#Digital_unsharp_masking).
-    /// It returns `true` on success and `false` in case of an error.
+    /// It returns `Ok(())` on success and `Err(OperationError)` in case of an error.
     ///
     /// # Arguments
     ///

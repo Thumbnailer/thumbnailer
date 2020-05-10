@@ -26,7 +26,7 @@ impl Operation for ResizeOp {
     /// Logic for the resize-operation
     ///
     /// This function resizes a `DynamicImage`, depending on the options given by the members of `ResizeOp` struct.
-    /// It returns `true` on success and `false` in case of an error.
+    /// It returns `Ok(())` on success and `Err(OperationError)` in case of an error.
     ///
     /// # Arguments
     ///
