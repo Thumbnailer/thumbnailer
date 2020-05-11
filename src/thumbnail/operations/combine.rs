@@ -59,7 +59,7 @@ impl Operation for CombineOp {
     ///
     /// let position = BoxPosition::BottomRight(750, 450);
     /// let mut dynamic_image = DynamicImage::new_rgb8(800, 500);
-    /// let dynamic_image_2 = DynamicImage::new_rgb8(100, 100);
+    /// let dynamic_image_2 = DynamicImage::new_rgba8(100, 100);
     ///
     /// let mut thumbnail = Thumbnail::from_dynamic_image("test.jpg", dynamic_image_2);
     /// let mut static_thumbnail = match thumbnail.clone_static_copy() {
@@ -76,11 +76,12 @@ impl Operation for CombineOp {
     where
         Self: Sized,
     {
+        let (overlay_width, overlay_height) = self.image.dimensions();
         let (x_pos_overlay_image, y_pos_overlay_image) = match self.pos {
             BoxPosition::TopLeft(x, y) => (x, y),
             BoxPosition::TopRight(x, y) => {
-                if x >= self.image.get_width() {
-                    (x - self.image.get_width(), y)
+                if x >= overlay_width {
+                    (x - overlay_width, y)
                 } else {
                     return Err(OperationError::new(
                         Box::new(self.clone()),
@@ -89,8 +90,8 @@ impl Operation for CombineOp {
                 }
             }
             BoxPosition::BottomLeft(x, y) => {
-                if y >= self.image.get_height() {
-                    (x, y - self.image.get_height())
+                if y >= overlay_height {
+                    (x, y - overlay_height)
                 } else {
                     return Err(OperationError::new(
                         Box::new(self.clone()),
@@ -99,8 +100,8 @@ impl Operation for CombineOp {
                 }
             }
             BoxPosition::BottomRight(x, y) => {
-                if x >= self.image.get_width() && y >= self.image.get_height() {
-                    (x - self.image.get_width(), y - self.image.get_height())
+                if x >= overlay_width && y >= overlay_height {
+                    (x - overlay_width, y - overlay_height)
                 } else {
                     return Err(OperationError::new(
                         Box::new(self.clone()),

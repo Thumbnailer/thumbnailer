@@ -1,4 +1,4 @@
-use image::DynamicImage;
+use image::{DynamicImage, GenericImageView};
 use std::fmt;
 use std::fmt::Formatter;
 use std::path::PathBuf;
@@ -35,20 +35,9 @@ impl StaticThumbnail {
         &self.image
     }
 
-    /// Gets the width of the image
-    pub fn get_width(&self) -> u32 {
-        match self.as_dyn().as_rgb8() {
-            Some(rgb_image) => rgb_image.width(),
-            None => 0,
-        }
-    }
-
-    /// Gets the width of the image
-    pub fn get_height(&self) -> u32 {
-        match self.as_dyn().as_rgb8() {
-            Some(rgb_image) => rgb_image.height(),
-            None => 0,
-        }
+    /// Gets dimensions of the image data
+    pub fn dimensions(&self) -> (u32, u32) {
+        self.as_dyn().dimensions()
     }
 
     /// Gets the stored origin path of the image
