@@ -2,7 +2,7 @@ pub use crate::errors::{OperationError, OperationErrorInfo};
 use crate::thumbnail::operations::Operation;
 use crate::{ResampleFilter, Resize};
 use image::imageops::FilterType;
-use image::DynamicImage;
+use image::{DynamicImage, GenericImageView};
 
 #[derive(Debug, Copy, Clone)]
 /// Representation of the resizing operation as a struct
@@ -54,15 +54,8 @@ impl Operation for ResizeOp {
     /// assert!(res.is_ok());
     /// ```
     fn apply(&self, image: &mut DynamicImage) -> Result<(), OperationError> {
-        let aspect_ratio = match image.as_rgb8() {
-            Some(rgb_image) => rgb_image.width() as f32 / rgb_image.height() as f32,
-            _ => {
-                return Err(OperationError::new(
-                    Box::new(*self),
-                    OperationErrorInfo::ImageBufferConversionFailure,
-                ))
-            }
-        };
+        let (width, height) = image.dimensions();
+        let aspect_ratio = width as f32 / height as f32;
 
         let filter_type = match self.filter {
             Some(ResampleFilter::Nearest) => Some(FilterType::Nearest),
