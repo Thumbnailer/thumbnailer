@@ -39,6 +39,11 @@ impl Operation for TextOp {
     /// * `&self` - The `TextOp` struct
     /// * `image` - The `DynamicImage` where the text should be drawn on
     ///
+    /// # Errors
+    /// 
+    /// * FontLoadError - The font cannnot be loaded
+    /// * CoordinatesOutOfRange - The coordinates for the text are not inside the background image
+    ///
     /// # Panic
     ///
     /// This function won't panic.
