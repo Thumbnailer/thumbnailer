@@ -5,12 +5,18 @@ use std::fmt::Formatter;
 use std::path::PathBuf;
 use std::{fmt, io};
 
+/// Error type while interacting with files or the filesystem
 #[derive(Debug)]
 pub enum FileError {
+    /// Error while parsing the glob
     GlobError(io::Error),
+    /// Given file could not be found
     NotFound(FileNotFoundError),
+    /// Given file cannot be decoded
     NotSupported(FileNotSupportedError),
+    /// General io error
     IoError(io::Error),
+    /// Error could not be correctly determined
     UnknownError,
 }
 
@@ -26,8 +32,10 @@ impl std::convert::From<std::io::Error> for FileError {
     }
 }
 
+/// The `FileNotFoundError` type. Provides information for FileError::NotFound
 #[derive(Debug, Clone)]
 pub struct FileNotFoundError {
+    /// Path that could not be found
     pub path: PathBuf,
 }
 
@@ -46,16 +54,19 @@ impl Error for FileNotFoundError {
         None
     }
 }
+/// The `FileNotSupportedError` type. Provides information for FileError::NotSupported
 #[derive(Debug)]
 pub struct FileNotSupportedError {
+    /// Path of the file that could not be decoded.
     path: PathBuf,
 }
 
 impl FileNotSupportedError {
+    /// Creates a new `FileNotSupportedError`
     pub fn new(path: PathBuf) -> Self {
         FileNotSupportedError { path }
     }
-
+    /// Gets the path of the file that caused the error
     pub fn get_path(&self) -> &PathBuf {
         &self.path
     }
@@ -76,7 +87,10 @@ impl Error for FileNotSupportedError {
         None
     }
 }
-
+/// Error type that can occur while applying operations to a GenericThumbnail instance or storing it.
+///
+///
+///
 pub enum ApplyError {
     OperationError(OperationError),
     StoreError(FileError),
@@ -91,9 +105,12 @@ pub enum OperationErrorInfo {
     FontLoadError,
 }
 
+/// Error that can occur while applying a single operation on a GenericThumbnail item
 #[derive(Debug, Clone)]
 pub struct OperationError {
+    /// Operation that failed
     op: Box<dyn Operation>,
+    /// Additional information on why it failed
     info: OperationErrorInfo,
 }
 
@@ -115,9 +132,14 @@ impl Error for OperationError {
     }
 }
 
+/// Error that can occur while applying or storing a GenericThumbnail that contains multiple images.
+///
 pub struct CollectionError {
+    /// Output file paths that weren't affected by the error and were successfully stored
     paths: Vec<PathBuf>,
+    /// List of all store errors that occurred while storing each item
     store_errors: Vec<FileError>,
+    /// List of all operations errors that occurred while applying operations to each item
     operation_errors: Vec<OperationError>,
 }
 
@@ -133,15 +155,15 @@ impl CollectionError {
             operation_errors,
         }
     }
-
+    /// Gets all paths that were successful despite errors occurring
     pub fn get_paths(&self) -> &Vec<PathBuf> {
         &self.paths
     }
-
+    /// Gets all StoreErrors that occurred while storing each item
     pub fn get_store_errors(&self) -> &Vec<FileError> {
         &self.store_errors
     }
-
+    /// Gets all OperationErrors that occurred while applying all operations to each item
     pub fn get_operation_errors(&self) -> &Vec<OperationError> {
         &self.operation_errors
     }
