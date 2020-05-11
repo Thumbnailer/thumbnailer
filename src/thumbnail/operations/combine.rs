@@ -58,8 +58,8 @@ impl Operation for CombineOp {
     /// use image::DynamicImage;
     ///
     /// let position = BoxPosition::BottomRight(750, 450);
-    /// let mut dynamic_image = DynamicImage::new_rgb8(800, 500);
-    /// let dynamic_image_2 = DynamicImage::new_rgba8(100, 100);
+    /// let mut dynamic_image = DynamicImage::new_rgba8(800, 500);
+    /// let dynamic_image_2 = DynamicImage::new_rgb8(100, 100);
     ///
     /// let mut thumbnail = Thumbnail::from_dynamic_image("test.jpg", dynamic_image_2);
     /// let mut static_thumbnail = match thumbnail.clone_static_copy() {
@@ -116,6 +116,7 @@ impl Operation for CombineOp {
 
         match image.as_mut_rgba8() {
             Some(background_buffer) => {
+                // Insertion of the overlay if the background ist a RgbaImage
                 for (x, y, pixel) in overlay_image_buffer.enumerate_pixels() {
                     let x_pos_current_pixel = x + x_pos_overlay_image;
                     let y_pos_current_pixel = y + y_pos_overlay_image;
@@ -123,11 +124,12 @@ impl Operation for CombineOp {
                     if x_pos_current_pixel < bg_width && y_pos_current_pixel < bg_height {
                         let background_pixel = background_buffer
                             .get_pixel_mut(x_pos_current_pixel, y_pos_current_pixel);
+                        let alpha = pixel[3] as f32 / 255.0;
+                        let alpha_inv = 1.0 - alpha;
+
                         for index in 0..2 {
-                            background_pixel[index] = ((pixel[3] as f32 / 255.0)
-                                * pixel[index] as f32
-                                + ((255 - pixel[3]) as f32 / 255.0)
-                                    * background_pixel[index] as f32)
+                            background_pixel[index] = (alpha * pixel[index] as f32
+                                + alpha_inv * background_pixel[index] as f32)
                                 as u8;
                         }
                     }
@@ -135,6 +137,7 @@ impl Operation for CombineOp {
             }
             None => match image.as_mut_rgb8() {
                 Some(background_buffer) => {
+                    // Insertion of the overlay if the background is a RgbImage
                     for (x, y, pixel) in overlay_image_buffer.enumerate_pixels() {
                         let x_pos_current_pixel = x + x_pos_overlay_image;
                         let y_pos_current_pixel = y + y_pos_overlay_image;
@@ -142,11 +145,12 @@ impl Operation for CombineOp {
                         if x_pos_current_pixel < bg_width && y_pos_current_pixel < bg_height {
                             let background_pixel = background_buffer
                                 .get_pixel_mut(x_pos_current_pixel, y_pos_current_pixel);
+                            let alpha = pixel[3] as f32 / 255.0;
+                            let alpha_inv = 1.0 - alpha;
+
                             for index in 0..2 {
-                                background_pixel[index] = ((pixel[3] as f32 / 255.0)
-                                    * pixel[index] as f32
-                                    + ((255 - pixel[3]) as f32 / 255.0)
-                                        * background_pixel[index] as f32)
+                                background_pixel[index] = (alpha * pixel[index] as f32
+                                    + alpha_inv * background_pixel[index] as f32)
                                     as u8;
                             }
                         }
