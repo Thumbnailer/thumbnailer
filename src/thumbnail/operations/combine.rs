@@ -1,7 +1,7 @@
 pub use crate::errors::{OperationError, OperationErrorInfo};
 use crate::thumbnail::operations::Operation;
 use crate::{BoxPosition, StaticThumbnail};
-use image::DynamicImage;
+use image::{DynamicImage, GenericImageView};
 use std::fmt;
 use std::fmt::Formatter;
 
@@ -57,7 +57,7 @@ impl Operation for CombineOp {
     /// use thumbnailer::thumbnail::operations::CombineOp;
     /// use image::DynamicImage;
     ///
-    /// let position = BoxPosition::TopLeft(23, 40);
+    /// let position = BoxPosition::BottomRight(750, 450);
     /// let mut dynamic_image = DynamicImage::new_rgb8(800, 500);
     /// let dynamic_image_2 = DynamicImage::new_rgb8(100, 100);
     ///
@@ -76,7 +76,7 @@ impl Operation for CombineOp {
     where
         Self: Sized,
     {
-        let (pos_x, pos_y) = match self.pos {
+        let (x_pos_overlay_image, y_pos_overlay_image) = match self.pos {
             BoxPosition::TopLeft(x, y) => (x, y),
             BoxPosition::TopRight(x, y) => {
                 if x >= self.image.get_width() {
@@ -111,29 +111,43 @@ impl Operation for CombineOp {
         };
 
         let overlay_image_buffer = self.image.as_dyn().to_rgba();
+        let (bg_width, bg_height) = image.dimensions();
 
         match image.as_mut_rgba8() {
             Some(background_buffer) => {
                 for (x, y, pixel) in overlay_image_buffer.enumerate_pixels() {
-                    let background_pixel = background_buffer.get_pixel_mut(x + pos_x, y + pos_y);
-                    for index in 0..2 {
-                        background_pixel[index] = ((pixel[3] as f32 / 255.0) * pixel[index] as f32
-                            + ((255 - pixel[3]) as f32 / 255.0) * background_pixel[index] as f32)
-                            as u8;
-                    }
-                }
-            }
-            None => match image.as_mut_rgb8() {
-                Some(background_buffer) => {
-                    for (x, y, pixel) in overlay_image_buffer.enumerate_pixels() {
-                        let background_pixel =
-                            background_buffer.get_pixel_mut(x + pos_x, y + pos_y);
+                    let x_pos_current_pixel = x + x_pos_overlay_image;
+                    let y_pos_current_pixel = y + y_pos_overlay_image;
+
+                    if x_pos_current_pixel < bg_width && y_pos_current_pixel < bg_height {
+                        let background_pixel = background_buffer
+                            .get_pixel_mut(x_pos_current_pixel, y_pos_current_pixel);
                         for index in 0..2 {
                             background_pixel[index] = ((pixel[3] as f32 / 255.0)
                                 * pixel[index] as f32
                                 + ((255 - pixel[3]) as f32 / 255.0)
                                     * background_pixel[index] as f32)
                                 as u8;
+                        }
+                    }
+                }
+            }
+            None => match image.as_mut_rgb8() {
+                Some(background_buffer) => {
+                    for (x, y, pixel) in overlay_image_buffer.enumerate_pixels() {
+                        let x_pos_current_pixel = x + x_pos_overlay_image;
+                        let y_pos_current_pixel = y + y_pos_overlay_image;
+
+                        if x_pos_current_pixel < bg_width && y_pos_current_pixel < bg_height {
+                            let background_pixel = background_buffer
+                                .get_pixel_mut(x_pos_current_pixel, y_pos_current_pixel);
+                            for index in 0..2 {
+                                background_pixel[index] = ((pixel[3] as f32 / 255.0)
+                                    * pixel[index] as f32
+                                    + ((255 - pixel[3]) as f32 / 255.0)
+                                        * background_pixel[index] as f32)
+                                    as u8;
+                            }
                         }
                     }
                 }
