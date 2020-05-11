@@ -98,10 +98,14 @@ pub enum ApplyError {
     LoadingImageError(FileError),
 }
 
+/// Error types used as additional information for `OperationError`
 #[derive(Debug, Clone)]
 pub enum OperationErrorInfo {
+    /// Some coordinates given to a function are not supported, for example when referencing coordinates that are not inside an image.
     CoordinatesOutOfRange,
+    /// The Conversion of a `DynamicImage` to an `ImageBuffer` was not successful
     ImageBufferConversionFailure,
+    /// A font could not be loaded
     FontLoadError,
 }
 
