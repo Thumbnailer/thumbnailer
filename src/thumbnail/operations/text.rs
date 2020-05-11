@@ -40,7 +40,7 @@ impl Operation for TextOp {
     /// * `image` - The `DynamicImage` where the text should be drawn on
     ///
     /// # Errors
-    /// 
+    ///
     /// * FontLoadError - The font cannnot be loaded
     /// * CoordinatesOutOfRange - The coordinates for the text are not inside the background image
     ///

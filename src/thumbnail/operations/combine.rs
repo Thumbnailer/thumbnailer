@@ -40,7 +40,7 @@ impl Operation for CombineOp {
     /// * `image` - The `DynamicImage` where the text should be drawn on
     ///
     /// # Errors
-    /// 
+    ///
     /// * CoordinatesOutOfRange - The coordinates for the overlayed image are not inside the background image
     /// * ImageBufferConversionFailure - The supplied background image cannot be converted to an 'ImageBuffer'
     ///
