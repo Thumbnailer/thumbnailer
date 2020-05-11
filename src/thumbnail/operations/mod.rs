@@ -48,12 +48,14 @@ impl<T> OperationClone for T
 where
     T: 'static + Operation + Clone,
 {
+    /// Clones the `Operation` instance into a `Box<dyn Operation>`
     fn box_clone(&self) -> Box<dyn Operation> {
         Box::new(self.clone())
     }
 }
 
 impl Clone for Box<dyn Operation> {
+    /// Clones the `Box<dyn Operation>` instance
     fn clone(&self) -> Self {
         self.box_clone()
     }

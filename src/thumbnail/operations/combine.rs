@@ -39,6 +39,11 @@ impl Operation for CombineOp {
     /// * `&self` - The `CombineOp` struct
     /// * `image` - The `DynamicImage` where the text should be drawn on
     ///
+    /// # Errors
+    /// 
+    /// * CoordinatesOutOfRange - The coordinates for the overlayed image are not inside the background image
+    /// * ImageBufferConversionFailure - The supplied background image cannot be converted to an 'ImageBuffer'
+    ///
     /// # Panic
     ///
     /// This function won't panic.
@@ -135,7 +140,7 @@ impl Operation for CombineOp {
                 None => {
                     return Err(OperationError::new(
                         Box::new(self.clone()),
-                        OperationErrorInfo::RgbImageConversionFailure,
+                        OperationErrorInfo::ImageBufferConversionFailure,
                     ))
                 }
             },

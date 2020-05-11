@@ -87,8 +87,7 @@ pub enum ApplyError {
 #[derive(Debug, Clone)]
 pub enum OperationErrorInfo {
     CoordinatesOutOfRange,
-    RgbaImageConversionFailure,
-    RgbImageConversionFailure,
+    ImageBufferConversionFailure,
     FontLoadError,
 }
 

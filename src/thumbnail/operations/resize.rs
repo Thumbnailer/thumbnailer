@@ -59,7 +59,7 @@ impl Operation for ResizeOp {
             _ => {
                 return Err(OperationError::new(
                     Box::new(*self),
-                    OperationErrorInfo::RgbImageConversionFailure,
+                    OperationErrorInfo::ImageBufferConversionFailure,
                 ))
             }
         };
